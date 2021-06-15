@@ -17,10 +17,10 @@ rendering in the markdown soon, as they are a bit ugly at present.
 
 ## Weekly schedule
 
-+ [Chapter 1: Introduction](#chapter-1)
-+ [Chapter 2: Supervised learning](#chapter-2)
++ [Chapter 1: Introduction](#introduction)
++ [Chapter 2: Supervised learning](#supervised-learning)
 
-## Chapter 1: Introduction
+## Introduction
 
 Frequent uses: prediction, classification, factor identification
 
@@ -54,7 +54,7 @@ discuss potential project topics with the teacher in on the course
 channel in Discord.
 
 
-## Chapter 2
+## Supervised learning
 
 It is important to mark variables as _categorical_ even if they are
 numbers (like the handwritten digits) when the value is not to be
