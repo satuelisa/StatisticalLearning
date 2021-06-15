@@ -54,8 +54,8 @@ non-metric ordering.
 
 Notation:
 
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;X) input variable (often a vector)
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;Y) quantitative output
++ input variable (often a vector) ![](https://latex.codecogs.com/gif.latex?\bg_black&space;X) 
++ quantitative output ![](https://latex.codecogs.com/gif.latex?\bg_black&space;Y) 
 + [](https://latex.codecogs.com/gif.latex?\bg_black&space;G) qualitative output
 + [](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{Y}) quantitative
 		prediction
