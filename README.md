@@ -15,7 +15,10 @@ use GitHub in dark mode, so the equations are set to have a black
 background with white text. I hope that there will be native LaTeX
 rendering in the markdown soon, as they are a bit ugly at present.
 
-## Chapter 1
++ [Chapter 1: Introduction](#chapter-1)
++ [Chapter 2: Supervised learning](#chapter-2)
+
+## Chapter 1: Introduction
 
 Frequent uses: prediction, classification, factor identification
 
@@ -41,8 +44,13 @@ Examples:
 ### Homework 1
 
 Identify one or more learning problems in your thesis work and
-identify their goals and elements. Write the description with GitHub
-markdown in the README.md of your course repository.
+identify their goals and elements. Write the description
+with
+[GitHub markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) in
+the README.md of your course repository. If your thesis work has none,
+discuss potential project topics with the teacher in on the course
+channel in Discord.
+
 
 ## Chapter 2
 
