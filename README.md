@@ -15,6 +15,8 @@ use GitHub in dark mode, so the equations are set to have a black
 background with white text. I hope that there will be native LaTeX
 rendering in the markdown soon, as they are a bit ugly at present.
 
+## Weekly schedule
+
 + [Chapter 1: Introduction](#chapter-1)
 + [Chapter 2: Supervised learning](#chapter-2)
 
