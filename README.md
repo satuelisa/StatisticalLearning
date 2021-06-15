@@ -86,4 +86,3 @@ prediction ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{G})
 
 to be done soon
 	
-
