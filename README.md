@@ -53,16 +53,16 @@ An _ordered_ categorical variable (small / medium / large) has a
 non-metric ordering.
 
 Notation:
-	+ ![](https://latex.codecogs.com/gif.latex?X) input variable (often a vector)
-	+ ![](https://latex.codecogs.com/gif.latex?Y) quantitative output
-	+ ![](https://latex.codecogs.com/gif.latex?G) qualitative output
-	+ ![](https://latex.codecogs.com/gif.latex?\hat{Y}) quantitative
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;X) input variable (often a vector)
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;Y) quantitative output
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;G) qualitative output
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{Y}) quantitative
 prediction
-	+ ![](https://latex.codecogs.com/gif.latex?\hat{G}) qualitative
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{G}) qualitative
 prediction
-	+ ![](https://latex.codecogs.com/gif.latex?(x_i, y_i)) quantitative
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;y_i)) quantitative
 training data
-	+ ![](https://latex.codecogs.com/gif.latex?(x_i, g_i)) qualitative
-training data ![](https://latex.codecogs.com/gif.latex?i&space;\in&space;1,\ldots,n) 
+	+ ![](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;g_i)) qualitative
+training data ![](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
 
 
