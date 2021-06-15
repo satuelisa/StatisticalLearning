@@ -40,5 +40,29 @@ Identify one or more learning problems in your thesis work and
 identify their goals and elements. Write the description with GitHub
 markdown in the README.md of your course repository.
 
+## Chapter 2
+
+It is important to mark variables as _categorical_ even if they are
+numbers (like the handwritten digits) when the value is not to be
+interpreter as an ordering of sorts.
+
+Predicting a **quantitative** variable is _regression_, whereas
+predicting a **qualitative** one is _classification_.
+
+An _ordered_ categorical variable (small / medium / large) has a
+non-metric ordering.
+
+Notation:
+	+ ![](https://latex.codecogs.com/gif.latex?X) input variable (often a vector)
+	+ ![](https://latex.codecogs.com/gif.latex?Y) quantitative output
+	+ ![](https://latex.codecogs.com/gif.latex?G) qualitative output
+	+ ![](https://latex.codecogs.com/gif.latex?\hat{Y}) quantitative
+prediction
+	+ ![](https://latex.codecogs.com/gif.latex?\hat{G}) qualitative
+prediction
+	+ ![](https://latex.codecogs.com/gif.latex?(x_i, y_i)) quantitative
+training data
+	+ ![](https://latex.codecogs.com/gif.latex?(x_i, g_i)) qualitative
+training data ![](https://latex.codecogs.com/gif.latex?i&space;\in&space;1,\ldots,n) 
 
 
