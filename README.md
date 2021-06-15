@@ -56,14 +56,17 @@ Notation:
 
 + input variable (often a vector) ![](https://latex.codecogs.com/gif.latex?\bg_black&space;X) 
 + quantitative output ![](https://latex.codecogs.com/gif.latex?\bg_black&space;Y) 
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;G) qualitative output
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{Y}) quantitative
-		prediction
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{G}) qualitative
-prediction
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;y_i)) quantitative
-training data [](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
-+ [](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;g_i)) qualitative
-		training data [](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
++ qualitative output ![](https://latex.codecogs.com/gif.latex?\bg_black&space;G) 
++ quantitative
+		prediction ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{Y}) 
++ qualitative
+prediction ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{G}) 
++ quantitative training
+  data
+  ![](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;y_i))
+  ![](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
++ qualitative training data ![](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;g_i)) 
+		 ![](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
+	
 	
 
