@@ -84,5 +84,55 @@ prediction ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{G})
 
 ### Least squares for linear models
 
-to be done soon
-	
+The output is predicted as a weighted linear combination of the input
+vector plus a constant, where the weights and the constant need to be
+learned from the data. 
+
+We can avoid dealing with the constant separately by adding a unit
+input
+```python
+import numpy as np	
+x = np.transpose(np.array([1, 2, 3, 4])) # column vector 4 x 1                  
+n = len(x) # three features plus the constant                                   
+w = uniform(size = n) # four weights (random for now)                           
+yp = np.inner(x, w) # inner product of two rows        
+print(yp)
+```
+and the **quality** of the prediction is compared as a sum of squares
+between the desired values `y` and the predicted values `yp`. 
+````python
+w = np.transpose(w) # also as a column vector 4 x 1                             
+yp = np.matmul(np.transpose(x), w)  # (1 x 4) x (4 x 1) = 1 x 1                 
+print(yp)
+``` 
+Lets use matrices to make this more compact:
+
++ `X` is a matrix where each _row_ is an input vector and each column
+  is a feature
++ `Y` is a vector of the intended outputs (the first element for the
+  first row of `X`, the second for the second row, etc.)
+
+```python
+X = np.array([[1, 2, 3, 4], [1, 3, 5, 7], [1, 8, 7, 3]]) # 3 x 4                
+y = np.transpose(np.array([0.9, 1.4, 1.3])) # 3 x 1, one per input    
+
+def rss(X, y, w):
+    yp = np.matmul(X, w) # predictions for all inputs                           
+    return np.matmul(np.transpose(y - yp), (y - yp))
+```
+
+The best model in this sense is the one that minimizes RSS
+````python
+for r in range(10): # replicas                                                  
+    print(rss(X, y, uniform(size = n)))	# the smaller the better     
+``` and this is very similar to what the perceptron does (cf. the last
+homework of the simulation course, if you took that one already). This
+code (which is not a lot) is available in the
+file
+[`linear.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/linear.py) and
+I really recommend sticking to the NumPy routines for creating vectors
+and matrices as well as multiplying them. Remember to pay close
+attention to the dimensions.
+
+### Nearest neighbor
+ 
