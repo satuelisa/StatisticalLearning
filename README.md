@@ -100,7 +100,7 @@ print(yp)
 ```
 and the **quality** of the prediction is compared as a sum of squares
 between the desired values `y` and the predicted values `yp`. 
-````python
+```python
 w = np.transpose(w) # also as a column vector 4 x 1                             
 yp = np.matmul(np.transpose(x), w)  # (1 x 4) x (4 x 1) = 1 x 1                 
 print(yp)
