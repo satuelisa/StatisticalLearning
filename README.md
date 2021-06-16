@@ -19,6 +19,8 @@ rendering in the markdown soon, as they are a bit ugly at present.
 
 + [Chapter 1: Introduction](#introduction)
 + [Chapter 2: Supervised learning](#supervised-learning)
+..* [Section 2.2: Least squares for lineal  models](#least-squares-for-linear-models)
+..* [Section 2.3: Nearest neighbors](#nearest-neighbors)
 
 ## Introduction
 
