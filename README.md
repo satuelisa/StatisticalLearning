@@ -13,14 +13,18 @@ The data sets used in the examples are from
 the [book's website](https://www-stat.stanford.edu/ElemStatLearn). I
 use GitHub in dark mode, so the equations are set to have a black
 background with white text. I hope that there will be native LaTeX
-rendering in the markdown soon, as they are a bit ugly at present.
+rendering in the markdown soon, as they are a bit ugly at present. The
+book uses R in their example code, so I am going to replant everything
+in Python for an enriched experience and more pain on my part.
 
 ## Weekly schedule
 
 + [Chapter 1: Introduction](#introduction)
+  * [Homework 1](#homework-1)
 + [Chapter 2: Supervised learning](#supervised-learning)
   * [Section 2.2: Least squares for linear  models](#least-squares-for-linear-models)
   * [Section 2.3: Nearest neighbors](#nearest-neighbors)
+  * [Homework 2](#homework-2)
 
 ## Introduction
 
@@ -139,4 +143,98 @@ and matrices as well as multiplying them. Remember to pay close
 attention to the dimensions.
 
 ### Nearest neighbors
- 
+
+This technique supposes that we have a set of pre-labelled inputs in
+some (metric) space in which we can compute a distance from one input
+to another. Then, when we encounter a non-labelled input `x`, we
+simply take the `k` nearest labelled inputs and average over their
+values of `y` to obtain a `yp` for our `x`. When using just one
+neighbor, this effectively reduces to Voronoi cells (cf. the fourth
+homework of simulation).
+
+In terms of code, let's generate random data again (the book has a
+two-dimensional example):
+```python
+from math import sqrt
+from numpy import argmax
+from random import random, randint
+
+n = 5 # number of features
+# possible labels 1, 2, 3
+low = 1
+high = 3
+
+# generate 'labelled' data at random
+N = 100 # amount of known data points
+# a list of pairs (x, y)
+known = []
+for d in range(N):
+    known.append(([random() for i in range(n)], randint(low, high)))
+```
+For the metric, we will use the root of sum of squares of coordinate
+differences using the features as an Euclidean space:
+
+```python
+def dist(x1, x2): # using euclidean distance for simplicity
+    return sqrt(sum([(xi - xj)**2 for (xi, xj) in zip(x1, x2)]))
+```
+
+Now we can find for a given `x` the `k` known data points nearest to
+it and store the corresponding labels `y`; we have to consider all of
+the labelled data by turn and remember which `k` were the closest
+ones, which I will do in a simple for loop for clarity instead of
+attempting to iterate over a matrix.
+
+````python
+x = [random() for i in range(n)] # our 'unknown' x
+
+k = 3 # using three nearest neighbors
+nd = [float('inf')] * k # their distances (infinite at first)
+ny = [None] * k # the labels of the nearest neighbors
+
+for (xn, yn) in known:
+    d = dist(x, xn)
+    i = argmax(nd)
+    if d < nd[i]: # if smaller than the largest of the stored
+        nd[i] = d # replace that distance
+        ny[i] = yn # and that label
+```
+
+One the `k` closest labels are known, we average them and I will also
+round them as the labels in the known data were integers (a majority
+vote would be a reasonable option to rounding, as well as using the median):
+
+```python
+y = sum(ny) / k
+xs = ' ' .join(['%.2f' % round(xi ,2) for xi in x])
+print(f'[{xs}] is {round(y)}') # round to the closest label (a simple choice)
+```
+
+The complete code resides
+at
+[`knn.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/knn.py). 
+Things to consider when applying KNN are 
+
++ which metric to use for the distance
++ should the features be normalized somehow before doing any of this
++ how many neighbors should we use
++ how should be combine the labels of the neighbors to obtain a
+  prediction
+
+Read Sections 2.3 and 2.4 to improve your understanding of _why_ and
+_how_ these methods are expected to be useful, as well as Section 2.5
+to understand why they tend to fall apart when the number of features
+is very high (this is similar to what happens in the first simulation
+homework for the high-dimensional Brownian motion that no longer
+returns to the origin and the eleventh simulation homework with Pareto
+fronts where a high number of objective functions renders the
+filtering power of non-dominance effectively null and void). The
+remainder of the chapter introduces numerous theoretical concepts that
+we are likely to stumble upon later on, so please give them at least a
+cursorial look at this point so you know that they are there.
+
+### Homework 2
+
+First carry out Exercise 2.8 of the textbook with their ZIP-code data and then
+**replicate the process** the best you manage to some data from you own problem that
+was established in the first homework.
