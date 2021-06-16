@@ -185,7 +185,7 @@ the labelled data by turn and remember which `k` were the closest
 ones, which I will do in a simple for loop for clarity instead of
 attempting to iterate over a matrix.
 
-````python
+```python
 x = [random() for i in range(n)] # our 'unknown' x
 
 k = 3 # using three nearest neighbors
@@ -213,7 +213,8 @@ print(f'[{xs}] is {round(y)}') # round to the closest label (a simple choice)
 The complete code resides
 at
 [`knn.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/knn.py). 
-Things to consider when applying KNN are 
+
+Things to consider when applying KNN are:
 
 + which metric to use for the distance
 + should the features be normalized somehow before doing any of this
