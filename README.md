@@ -109,8 +109,9 @@ Lets use matrices to make this more compact:
 
 + `X` is a matrix where each _row_ is an input vector and each column
   is a feature
-+ `Y` is a vector of the intended outputs (the first element for the
++ `y` is a vector of the intended outputs (the first element for the
   first row of `X`, the second for the second row, etc.)
++ `yp` is then `X` multiplying the weight vector
 
 ```python
 X = np.array([[1, 2, 3, 4], [1, 3, 5, 7], [1, 8, 7, 3]]) # 3 x 4                
@@ -122,10 +123,11 @@ def rss(X, y, w):
 ```
 
 The best model in this sense is the one that minimizes RSS
-````python
+```python
 for r in range(10): # replicas                                                  
     print(rss(X, y, uniform(size = n)))	# the smaller the better     
-``` and this is very similar to what the perceptron does (cf. the last
+``` 
+and this is very similar to what the perceptron does (cf. the last
 homework of the simulation course, if you took that one already). This
 code (which is not a lot) is available in the
 file
