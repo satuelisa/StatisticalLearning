@@ -1,22 +1,32 @@
 import numpy as np    
-from numpy.random import uniform
+from numpy.random import uniform, normal
 
-x = np.transpose(np.array([1, 2, 3, 4])) # column vector 4 x 1
-n = len(x) # three features plus the constant
-w = uniform(size = n) # four weights (random for now)
-yp = np.inner(x, w) # inner product of two rows
-print(yp)
+x = np.array([1, 2, 3, 4]).T # a column vector n x 1
+n = len(x) # (n - 1) features plus the constant gives n
+w = np.array(uniform(size = n)).T # weights (random for now, between 0 and 1 for starters)
+iyp = np.inner(x, w) # inner product of two arrays
 
-w = np.transpose(w) # also as a column vector 4 x 1
-yp = np.matmul(np.transpose(x), w)  # (1 x 4) x (4 x 1) = 1 x 1
-print(yp)
+xt = [ x.T ] # transpose into a row vector, 1 x n
+yp = np.matmul(xt, w) # a scalar prediction, (1 x n) x (n x 1) = 1 x 1
+assert iyp == yp # should coincide with the inner product from above
 
-X = np.array([[1, 2, 3, 4], [1, 3, 5, 7], [1, 8, 7, 3]]) # 3 x 4
-y = np.transpose(np.array([0.9, 1.4, 1.3])) # 3 x 1, one per input
+X = np.array([[1, 1, 1], [3, 5, 7], [8, 7, 3], [2, 4, 6]]) # n x p
+assert n == np.shape(X)[0] # features as rows
+p = np.shape(X)[1] # inputs as columns
+
+# let assume the model is 3 x1 - 2 x2 + 4 x3 - 5 with small gaussian noise
+def gen(x):
+    return 5 * x[0] + 3 * x[1] - 2 * x[2] + 4 * x[3] + normal(loc = 0, scale = 0.2, size = 1)
+    
+y = np.apply_along_axis(gen, axis = 0, arr = X)[0] # 1 x p, one per input
 
 def rss(X, y, w):
-    yp = np.matmul(X, w) # predictions for all inputs
-    return np.matmul(np.transpose(y - yp), (y - yp))
+    Xt = X.T
+    yp = np.matmul(Xt, w) # predictions for all inputs
+    yyp = y - yp
+    assert np.shape(yp) == np.shape(y)
+    return np.matmul(yyp.T, yyp)
 
 for r in range(10): # replicas
-    print(rss(X, y, uniform(size = n))) # the smaller the better
+    wr = np.array(uniform(low = -6, high = 6, size = n)).T
+    print(f'{rss(X, y, wr)} for {wr}') # the smaller the better

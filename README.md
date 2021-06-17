@@ -10,12 +10,12 @@ in PDF
 at
 [Haestie's website at Stanford](https://web.stanford.edu/~hastie/Papers/ESLII.pdf).
 The data sets used in the examples are from
-the [book's website](https://www-stat.stanford.edu/ElemStatLearn). I
-use GitHub in dark mode, so the equations are set to have a black
-background with white text. I hope that there will be native LaTeX
-rendering in the markdown soon, as they are a bit ugly at present. The
-book uses R in their example code, so I am going to replant everything
-in Python for an enriched experience and more pain on my part.
+the [book's website](https://www-stat.stanford.edu/ElemStatLearn).  I
+hope that there will be native LaTeX rendering in the markdown soon,
+so I could include equations (the present solutions of generating
+images are quite ugly in darfk mode). The book uses R in their example
+code, so I am going to replant everything in Python for an enriched
+experience and more pain on my part.
 
 ## Weekly schedule
 
@@ -25,6 +25,8 @@ in Python for an enriched experience and more pain on my part.
   * [Section 2.2: Least squares for linear  models](#least-squares-for-linear-models)
   * [Section 2.3: Nearest neighbors](#nearest-neighbors)
   * [Homework 2](#homework-2)
++ [Chapter 3: Linear regression](#linear-regression)
+  * [Homework 3](#homework-3)
 
 ## Introduction
 
@@ -59,7 +61,6 @@ the README.md of your course repository. If your thesis work has none,
 discuss potential project topics with the teacher in on the course
 channel in Discord.
 
-
 ## Supervised learning
 
 It is important to mark variables as _categorical_ even if they are
@@ -74,19 +75,15 @@ non-metric ordering.
 
 Notation:
 
-+ input variable (often a vector) ![](https://latex.codecogs.com/gif.latex?\bg_black&space;X) 
-+ quantitative output ![](https://latex.codecogs.com/gif.latex?\bg_black&space;Y) 
-+ qualitative output ![](https://latex.codecogs.com/gif.latex?\bg_black&space;G) 
++ input variable (often a vector containing `p` features) `X`
++ quantitative output `Y`
++ qualitative output `G`
 + quantitative
-z		prediction ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{Y}) 
+  prediction `Yp`
 + qualitative
-prediction ![](https://latex.codecogs.com/gif.latex?\bg_black&space;\hat{G}) 
-+ quantitative training
-  data
-  ![](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;y_i))
-  ![](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
-+ qualitative training data ![](https://latex.codecogs.com/gif.latex?\bg_black&space;(x_i,&space;g_i)) 
-		 ![](https://latex.codecogs.com/gif.latex?\bg_black&space;i&space;\in&space;1,\ldots,n) 
+prediction `Gp`
++ `n` tuples of quantitative training data `(xi, yi)`
++ `n` tuples of qualitative training data `(xi, gi)`
 
 ### Least squares for linear models
 
@@ -97,41 +94,60 @@ learned from the data.
 We can avoid dealing with the constant separately by adding a unit
 input
 ```python
-import numpy as np	
-x = np.transpose(np.array([1, 2, 3, 4])) # column vector 4 x 1                  
-n = len(x) # three features plus the constant                                   
-w = uniform(size = n) # four weights (random for now)                           
-yp = np.inner(x, w) # inner product of two rows        
-print(yp)
+import numpy as np
+from numpy.random import uniform, normal
+
+x = np.array([1, 2, 3, 4]).T # a column vector n x 1                                                  
+n = len(x) # (n - 1) features plus the constant gives n                                               
+w = np.array(uniform(size = n)).T # weights (random for now, between 0 and 1 for starters)            
+iyp = np.inner(x, w) # inner product of two arrays        
 ```
 and the **quality** of the prediction is compared as a sum of squares
 between the desired values `y` and the predicted values `yp`. 
 ```python
-w = np.transpose(w) # also as a column vector 4 x 1                             
-yp = np.matmul(np.transpose(x), w)  # (1 x 4) x (4 x 1) = 1 x 1                 
-print(yp)
+xt = [ x.T ] # transpose into a row vector, 1 x n                                                     
+yp = np.matmul(xt, w) # a scalar prediction, (1 x n) x (n x 1) = 1 x 1                                
+assert iyp == yp # should coincide with the inner product from above            
 ``` 
 Lets use matrices to make this more compact:
 
-+ `X` is a matrix where each _row_ is an input vector and each column
-  is a feature
-+ `y` is a vector of the intended outputs (the first element for the
-  first row of `X`, the second for the second row, etc.)
-+ `yp` is then `X` multiplying the weight vector
++ `X` is a matrix where each _column_ is an input vector (`n` inputs)
+  and each _row_ is a feature (`p` features)
++ `y` is a vector of the intended labels/outputs (the first element for the
+  first column of `X`, the second for the second column, etc.)
++ `yp` is then obtained as `X` multiplying the weight vector `w`
 
 ```python
-X = np.array([[1, 2, 3, 4], [1, 3, 5, 7], [1, 8, 7, 3]]) # 3 x 4                
-y = np.transpose(np.array([0.9, 1.4, 1.3])) # 3 x 1, one per input    
+X = np.array([[1, 1, 1],
+              [3, 5, 7],
+              [8, 7, 3],
+              [2, 4, 6]]) # n x p        
+assert n == np.shape(X)[0] # features as rows                                                         
+p = np.shape(X)[1] # inputs as columns                                                                
+
+# let assume the model is 3 x1 - 2 x2 + 4 x3 - 5 with small gaussian noise                            
+def gen(x): # generate integer labels from an arbitrary model                                         
+    label = 5 * x[0] + 3 * x[1] - 2 * x[2] + 4 * x[3] \
+                  + normal(loc = 0, scale = 0.2, size = 1)
+    label = round(label[0])
+    print(x, 'gets', label)
+    return label
+
+y = np.apply_along_axis(gen, axis = 0, arr = X) # 1 x p, one per input                             
 
 def rss(X, y, w):
-    yp = np.matmul(X, w) # predictions for all inputs                           
-    return np.matmul(np.transpose(y - yp), (y - yp))
+    Xt = X.T
+    yp = np.matmul(Xt, w) # predictions for all inputs                                                
+    yyp = y - yp
+    assert np.shape(yp) == np.shape(y)
+    return np.matmul(yyp.T, yyp)
 ```
 
 The best model in this sense is the one that minimizes RSS
 ```python
-for r in range(10): # replicas                                                  
-    print(rss(X, y, uniform(size = n)))	# the smaller the better     
+for r in range(10): # replicas                                                                        
+    wr = np.array(uniform(low = -6, high = 6, size = n)).T
+    print(f'{rss(X, y, wr)} for {wr}') # the smaller the better   
 ``` 
 and this is very similar to what the perceptron does (cf. the last
 homework of the simulation course, if you took that one already). This
@@ -239,3 +255,100 @@ cursorial look at this point so you know that they are there.
 First carry out Exercise 2.8 of the textbook with their ZIP-code data and then
 **replicate the process** the best you manage to some data from you own problem that
 was established in the first homework.
+
+
+## Linear regression
+
+We assume the expected value of `y` given `x` to be a linear function
+of the features. We can either use the raw features or apply
+_transformations_ (roots, logarithms, powers) to the quantitative
+ones, whereas the qualitative ones can be numerically coded (varying
+the ordering), and we could create _interactions_ by introducing
+auxiliary functions to create a "combination feature" that takes as
+inputs two or more of the original features. As noted befare, we
+usually aim to choose the weights so as to minimize the residual sum
+of squares (RSS). Such minimization, theoretically, is achieved by
+setting its first derivative to zero and solving for the weights.
+We now put the inputs as _rows_ in `X` and the features (including the
+constant) as _columns_, to match the notation of the book. (Yeah, my
+brain does not enjoy this either.) First we update the RSS routine to
+match the switch:
+
+```python
+from numpy.linalg import inv # matrix inverse                                                         
+from numpy.random import uniform, normal
+
+def rss(X, y, w):
+    yp = np.matmul(X, w) # no longer transposed, we switched this around                              
+    yyp = y - yp
+    return np.matmul(yyp.T, yyp)
+
+```
+
+Let's use more inputs and features this time around and a bit more
+noise in the model that generates the labels:
+
+```python
+# n x p total dimensions                                                                              
+Xt = np.array([[1, 1, 1, 1, 1, 1], # the constants                                                    
+              [2, 5, 7, 3, 5, 2], # feature 1                                                         
+              [8, 6, 3, 1, 9, 4], # feature 2                                                         
+              [2, 3, 5, 2, 4, 5], # feature 3                                                         
+              [3, 4, 5, 4, 4, 8]]) # feature                                                          
+X = Xt.T # transpose to match the equations                                                           
+n = np.shape(X)[0]
+p = np.shape(X)[1]
+print(np.shape(X)[1] - 1, 'features (plus constant)')
+
+def gen(x): # a bit more randomness this time and use integers                                        
+    count = np.shape(x)[0] + 1
+    noise = normal(loc = 0, scale = 0.1, size = count).tolist()
+    return round((5 + noise.pop()) * x[0] \
+                 + (3 + noise.pop()) * x[1] \
+                 - (2 + noise.pop()) * x[2] \
+                 + (4 + noise.pop()) * x[3] \
+                 - (6 + noise.pop()) * x[4] \
+                + noise.pop())
+
+# the three labels from the formula                                                                   
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
+print(f'{n} labels: {y}')
+```
+
+Now we can replicate the equations for the unique zero of the
+derivative:
+````python
+XtX = np.matmul(Xt, X)
+XtXi = inv(XtX)
+XXX = np.matmul(XtXi, Xt)
+print(np.shape(XXX), np.shape(y))
+w = np.matmul(XXX, y)
+ba = rss(X, y, w)
+print(f'best analytical {ba:.3f} with weights {w}')
+```
+
+We can use it to construct a prediction:
+````python
+pred = np.matmul(X, w)
+for (yl, yp) in zip(y, pred):
+    print(f'{round(yp)} for {yl} ({yp:.3f} without rounding)')
+```
+
+As before, we can also compare it with how just choosing weights at
+random and picking the lowest RSS would perform:
+
+```python
+lowest = float('inf')
+for r in range(1000): # try a bunch of random ones                                                    
+    wr = np.array(uniform(low = min(w), high = max(w), size = p))
+    lowest = min(lowest, rss(X, y, wr))
+print(f'the best random attempt has RSS {lowest:.2f} whereas the optimal has {ba:.2f}')
+```
+
+Note that this will not work if any of the inputs are perfectly
+correlated, so some pre-processing may be necessary.
+
+
+### Homework 3
+
+Pending, sorry.
