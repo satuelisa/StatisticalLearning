@@ -317,7 +317,7 @@ print(f'{n} labels: {y}')
 
 Now we can replicate the equations for the unique zero of the
 derivative:
-````python
+```python
 XtX = np.matmul(Xt, X)
 XtXi = inv(XtX)
 XXX = np.matmul(XtXi, Xt)
@@ -328,6 +328,7 @@ print(f'best analytical {ba:.3f} with weights {w}')
 ```
 
 We can use it to construct a prediction:
+
 ```python
 pred = np.matmul(X, w)
 for (yl, yp) in zip(y, pred):
