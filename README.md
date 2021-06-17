@@ -328,7 +328,7 @@ print(f'best analytical {ba:.3f} with weights {w}')
 ```
 
 We can use it to construct a prediction:
-````python
+```python
 pred = np.matmul(X, w)
 for (yl, yp) in zip(y, pred):
     print(f'{round(yp)} for {yl} ({yp:.3f} without rounding)')
