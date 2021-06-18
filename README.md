@@ -269,38 +269,19 @@ inputs two or more of the original features. As noted befare, we
 usually aim to choose the weights so as to minimize the residual sum
 of squares (RSS). Such minimization, theoretically, is achieved by
 setting its first derivative to zero and solving for the weights.
-We now put the inputs as _rows_ in `X` and the features (including the
-constant) as _columns_, to match the notation of the book. (Yeah, my
-brain does not enjoy this either.) First we update the RSS routine to
-match the switch:
 
 ```python
-from numpy.linalg import inv # matrix inverse                                                         
-from numpy.random import uniform, normal
-
 def rss(X, y, w):
-    yp = np.matmul(X, w) # no longer transposed, we switched this around                              
+    yp = np.matmul(X, w) # n predictions, one per input                                                                                
     yyp = y - yp
     return np.matmul(yyp.T, yyp)
-
 ```
 
 Let's use more inputs and features this time around and a bit more
 noise in the model that generates the labels:
 
 ```python
-# n x p total dimensions                                                                              
-Xt = np.array([[1, 1, 1, 1, 1, 1], # the constants                                                    
-              [2, 5, 7, 3, 5, 2], # feature 1                                                         
-              [8, 6, 3, 1, 9, 4], # feature 2                                                         
-              [2, 3, 5, 2, 4, 5], # feature 3                                                         
-              [3, 4, 5, 4, 4, 8]]) # feature                                                          
-X = Xt.T # transpose to match the equations                                                           
-n = np.shape(X)[0]
-p = np.shape(X)[1]
-print(np.shape(X)[1] - 1, 'features (plus constant)')
-
-def gen(x): # a bit more randomness this time and use integers                                        
+def gen(x): # a bit more randomness this time and use integers                                                                         
     count = np.shape(x)[0] + 1
     noise = normal(loc = 0, scale = 0.1, size = count).tolist()
     return round((5 + noise.pop()) * x[0] \
@@ -309,19 +290,26 @@ def gen(x): # a bit more randomness this time and use integers
                  + (4 + noise.pop()) * x[3] \
                  - (6 + noise.pop()) * x[4] \
                 + noise.pop())
-
-# the three labels from the formula                                                                   
-y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
-print(f'{n} labels: {y}')
 ```
 
 Now we can replicate the equations for the unique zero of the
 derivative:
 ```python
+Xt = np.array([[1, 1, 1, 1, 1, 1, 1, 1], # the constants                                                                               
+               [2, 5, 7, 3, 5, 2, 1, 2], # feature 1                                                                                   
+               [8, 6, 3, 1, 9, 4, 3, 2], # feature 2                                                                                   
+               [2, 3, 5, 2, 4, 5, 7, 3], # feature 3                                                                                   
+               [3, 4, 5, 4, 4, 8, 8, 2]]) # feature 4                                                                                  
+X = Xt.T
+n = np.shape(X)[0]
+p = np.shape(X)[1]
+print(p, 'features (incl. a constant)')
+print(n, 'inputs')
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
+print(f'{n} labels: {y}')
 XtX = np.matmul(Xt, X)
 XtXi = inv(XtX)
 XXX = np.matmul(XtXi, Xt)
-print(np.shape(XXX), np.shape(y))
 w = np.matmul(XXX, y)
 ba = rss(X, y, w)
 print(f'best analytical {ba:.3f} with weights {w}')
@@ -340,16 +328,157 @@ random and picking the lowest RSS would perform:
 
 ```python
 lowest = float('inf')
-for r in range(1000): # try a bunch of random ones                                                    
+for r in range(1000): # try a bunch of random ones                                                                                     
     wr = np.array(uniform(low = min(w), high = max(w), size = p))
     lowest = min(lowest, rss(X, y, wr))
 print(f'the best random attempt has RSS {lowest:.2f} whereas the optimal has {ba:.2f}')
 ```
 
 Note that this will not work if any of the inputs are perfectly
-correlated, so some pre-processing may be necessary.
+correlated (as it would result in a singular matrix for
+`np.matmul(X.T, T)`, so some pre-processing may be necessary. If `p`
+is much larger than `n`, problems may also arise and some
+dimensinality-reduction in the feature space could come in handy.  All
+of the above takes place
+in
+[`regression.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/regression.py).
+
+Let's make another version that actually examines the correlations and
+attempts to assess the statistical significance of the model, whenever
+one manages to be made. We will make a new generator and set some parameters:
+
+```python
+import numpy as np
+from math import sqrt
+from scipy.stats import chi2
+from numpy.linalg import inv
+from numpy.random import normal, uniform
+
+np.set_printoptions(precision = 2, suppress = True)
+
+def gen(x): # include two redundant inputs, x3 and x5                                                                                                                                                                  
+    count = np.shape(x)[0] + 1
+    noise = normal(loc = 0, scale = 0.05, size = count).tolist()
+    # a non-zero coefficient this time and no rounding                                                                                                                                                                 
+    return noise.pop() + 50 \
+        + (12 + noise.pop()) * x[0] \
+        + (8 + noise.pop()) * x[1] \
+        - (23 + noise.pop()) * x[2] \
+        + noise.pop() * x[3] \
+        - (16 + noise.pop()) * x[4] \
+        + noise.pop() * x[5] \
+        - (4 + noise.pop()) * x[6]
+
+n = 15
+p = 7
+high = 0.9 # correlation threshold     
+alpha = 0.05 # significance level for the p value                                                                                                                                                                      
+
+# more inputs this time so that n - 1 > p                                                                                                                                                                              
+constants = np.ones((1, n))
+```
+
+Now we can loop until success (see [`zscore.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/zscore.py)
+for the whole thing). We randomly create some data and use the
+generation model to assign labels if the correlation checks pass:
+
+```python
+X = np.vstack((constants, features)) # put the constants on the top row                                                                                                                                            
+assert p == np.shape(X)[0]
+assert n == np.shape(X)[1]
+	
+# check for correlations in the inputs (columns of X)                                                                                                                                                              
+cc = np.corrcoef(X, rowvar = False)
+mask = np.ones(cc.shape, dtype = bool)
+np.fill_diagonal(mask, 0)
+if cc[mask].max() > high:
+	print('High correlations present in the inputs, aborting')
+	continue
+
+# check for correlations in the features (rows of X, excluding the constants)                                                                                                                                      
+cc = np.corrcoef(X[np.ix_([1, p - 1], [1, p - 1])], rowvar = True)
+mask = np.ones(cc.shape, dtype = bool)
+np.fill_diagonal(mask, 0)
+if cc[mask].max() > high:
+	print('High correlations present in the features, aborting')
+	continue
+
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X)) # generate the labels using the features                    
+```
+
+Once all of this plays out, we can try to run the math:
+
+```python
+XtX = np.matmul(Xt, X)
+try:
+	XtXi = inv(XtX)
+except:
+	print('Encountered a singular matrix regardless of the correlations checks')
+	continue
+v = np.diag(XtXi)
+XXX = np.matmul(XtXi, Xt)
+w = np.matmul(XXX, y)
+yp = np.matmul(X, w)
+dof = n - p - 1
+dy = y - yp
+dsq = np.inner(dy, dy) # sum([i**2 for i in dy])                                                                                 
+var = dsq / dof # variance
+sd = sqrt(var) # standard deviation                                      
+```
+
+Usually, one assumes that the deviations between the predicted `yp`
+and the expected `y` are normally distributed. If so, the estimated
+weights `w` are normally distibuted around the true weights and their
+variance is from a chi-squared distribution (`n - p - 1` DoF),
+allowing for the calculation of confidence intervals.  To
+statistically check if a specific weight in `w` is zero (that is, the
+corresponding input in `X` has no effect on the output `y`), we
+compute it's Z-score.
+
+```python
+if min(v) > 0: # all the vj are positive (that is, the math worked as intended)
+	for j in range(p):
+		z = w[j] / (sd * sqrt(v[j]))
+		print('Index', j, 'got a coefficient', w[j], 'which is non-zero' if chi2.pdf(z, dof) < alpha else 'which is insignificant')
+```
+
+We could use F-scores to compare between models with different subsets
+of features. We can also add confidence interval calculations`with the
+normality hypothesis
+
+```python
+from scipy.stats import norm
+z1a = norm.ppf(1 - alpha) # gaussian percentile                                     
+```
+by adding a bit of calculations:
+
+```python
+sqv = sqrt(v[j])
+ss = sd * sqv
+z = w[j] / ss
+signif = chi2.pdf(z, dof) < alpha
+print('Index', j, 'got a coefficient', w[j], 'which is non-zero' if signif else 'which is insignificant')
+if signif:
+	width =	z1a * sd
+	low = w[j] - width
+	high = w[j] + width
+	print(f'with a confidence interval [{low}, {high}]')
+```
+
+Note how these intervals are _huge_ when the model sucks. Always
+**look** at your results and question them.
+
+If we have **multiple** outputs, meaning that  `y` is now a matrix,
+too, (pending; I need to make the above models not suck and then I can
+move forward)
 
 
 ### Homework 3
 
-Pending, sorry.
+Repeat the steps of the prostate cancer example in Section 3.2.1 first
+with the book's data set and then with data from your own
+project. Calculate also the p-values and the confidence intervals for
+the model's coaefficients in both cases.
+
+
+
