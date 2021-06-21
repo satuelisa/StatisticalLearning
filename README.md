@@ -518,8 +518,9 @@ methods, check out the thorough examples by
 Repeat the steps of the prostate cancer example in Section 3.2.1 first
 as a univariate problem using the book's data set and then as a
 multi-variate problem with data from your own project. Calculate also
-the p-values and the confidence intervals for the model's
-coefficients for the uni-variate version.
+the p-values and the confidence intervals for the model's coefficients
+for the uni-variate version. Experiment, using libraries, also with
+subset selection.
 
 
 
