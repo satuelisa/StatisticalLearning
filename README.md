@@ -281,46 +281,48 @@ Let's use more inputs and features this time around and a bit more
 noise in the model that generates the labels:
 
 ```python
-def gen(x): # a bit more randomness this time and use integers                                                                         
-    count = np.shape(x)[0] + 1
-    noise = normal(loc = 0, scale = 0.1, size = count).tolist()
-    return round((5 + noise.pop()) * x[0] \
-                 + (3 + noise.pop()) * x[1] \
-                 - (2 + noise.pop()) * x[2] \
-                 + (4 + noise.pop()) * x[3] \
-                 - (6 + noise.pop()) * x[4] \
-                + noise.pop())
-```
-
-Now we can replicate the equations for the unique zero of the
-derivative:
-```python
-Xt = np.array([[1, 1, 1, 1, 1, 1, 1, 1], # the constants                                                                               
-               [2, 5, 7, 3, 5, 2, 1, 2], # feature 1                                                                                   
-               [8, 6, 3, 1, 9, 4, 3, 2], # feature 2                                                                                   
-               [2, 3, 5, 2, 4, 5, 7, 3], # feature 3                                                                                   
-               [3, 4, 5, 4, 4, 8, 8, 2]]) # feature 4                                                                                  
+Xt = np.array([[1, 1, 1 , 1, 1, 1, 1, 1], # the constants
+               [2, 5, 7, 3, 5, 2, 1, 2], # feature 1
+               [8, 6, 3, 1, 9, 4, 3, 2], # feature 2
+               [2, 3, 5, 2, 4, 5, 7, 3], # feature 3
+               [3, 4, 5, 4, 4, 8, 8, 2]]) # feature 4
 X = Xt.T
 n = np.shape(X)[0]
 p = np.shape(X)[1]
 print(p, 'features (incl. a constant)')
 print(n, 'inputs')
-y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
-print(f'{n} labels: {y}')
+coeff = uniform(size = p, low = -5, high = 5) # a model
+
+def gen(x): # a bit more randomness this time and use integers
+    count = np.shape(x)[0]
+    noise = normal(loc = 0, scale = 0.1, size = count).tolist()
+    return sum([coeff[i] * x[i] + noise[i] for i in range(count)]) 
+
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X)) 
+print(f'{n} labels: {y}')    
+```
+
+Now we can replicate the equations for the unique zero of the
+derivative:
+```python
+X = Xt.T
 XtX = np.matmul(Xt, X)
 XtXi = inv(XtX)
 XXX = np.matmul(XtXi, Xt)
 w = np.matmul(XXX, y)
 ba = rss(X, y, w)
-print(f'best analytical {ba:.3f} with weights {w}')
+print(f'best analytical {ba:.3f} with weights {w}:')
+for (wp, wt) in zip(w, coeff):
+    print(f'{wp:.3f} (recovered) for {wt:.3f} (inserted)')
 ```
 
 We can use it to construct a prediction:
 
 ```python
 pred = np.matmul(X, w)
+print('predictions:')
 for (yl, yp) in zip(y, pred):
-    print(f'{round(yp)} for {yl} ({yp:.3f} without rounding)')
+    print(f'{yp:.3f} for {yl:.3f}')
 ```
 
 As before, we can also compare it with how just choosing weights at
@@ -328,7 +330,7 @@ random and picking the lowest RSS would perform:
 
 ```python
 lowest = float('inf')
-for r in range(1000): # try a bunch of random ones                                                                                     
+for r in range(1000): # try a bunch of random ones
     wr = np.array(uniform(low = min(w), high = max(w), size = p))
     lowest = min(lowest, rss(X, y, wr))
 print(f'the best random attempt has RSS {lowest:.2f} whereas the optimal has {ba:.2f}')
@@ -345,37 +347,36 @@ in
 
 Let's make another version that actually examines the correlations and
 attempts to assess the statistical significance of the model, whenever
-one manages to be made. We will make a new generator and set some parameters:
+one manages to be made. First we set some parameters:
 
 ```python
 import numpy as np
 from math import sqrt
-from scipy.stats import chi2
 from numpy.linalg import inv
+from scipy.stats import norm
 from numpy.random import normal, uniform
+from scipy.stats.distributions import chi2
 
+np.seterr(all='raise') # see the origin of all troubles
 np.set_printoptions(precision = 2, suppress = True)
 
-def gen(x): # include two redundant inputs, x3 and x5                                                                                                                                                                  
-    count = np.shape(x)[0] + 1
-    noise = normal(loc = 0, scale = 0.05, size = count).tolist()
-    # a non-zero coefficient this time and no rounding                                                                                                                                                                 
-    return noise.pop() + 50 \
-        + (12 + noise.pop()) * x[0] \
-        + (8 + noise.pop()) * x[1] \
-        - (23 + noise.pop()) * x[2] \
-        + noise.pop() * x[3] \
-        - (16 + noise.pop()) * x[4] \
-        + noise.pop() * x[5] \
-        - (4 + noise.pop()) * x[6]
+high = 0.95 # correlation threshold
+alpha = 0.01 # significance level for the p value
+z1a = norm.ppf(1 - alpha) # gaussian percentile 
 
-n = 15
-p = 7
-high = 0.9 # correlation threshold     
-alpha = 0.05 # significance level for the p value                                                                                                                                                                      
-
-# more inputs this time so that n - 1 > p                                                                                                                                                                              
+# more inputs this time so that n - 1 > p 
+n = 100
+p = 10
+print('f{n} inputs, {p} features')
+dof = n - p - 1 # degrees of freedom
+coeff = uniform(size = p, low = -5, high = 5) # coefficients of features (model)
+coeff[p // 2] = 0 # make the middle one irrelevant
 constants = np.ones((1, n))
+
+def gen(x): # a bit more randomness this time and use integers
+    count = np.shape(x)[0]
+    noise = normal(loc = 0, scale = 0.1, size = count).tolist()
+    return sum([coeff[i] * x[i] + noise[i] for i in range(count)]) 
 ```
 
 Now we can loop until success (see [`zscore.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/zscore.py)
@@ -383,47 +384,49 @@ for the whole thing). We randomly create some data and use the
 generation model to assign labels if the correlation checks pass:
 
 ```python
-X = np.vstack((constants, features)) # put the constants on the top row                                                                                                                                            
-assert p == np.shape(X)[0]
-assert n == np.shape(X)[1]
-	
-# check for correlations in the inputs (columns of X)                                                                                                                                                              
-cc = np.corrcoef(X, rowvar = False)
+features = uniform(low = -50, high = 50, size = (p - 1, n))
+Xt = np.vstack((constants, features)) # put the constants on the top row
+X = Xt.T # put the inputs in columnns
+assert p == np.shape(X)[1]
+assert n == np.shape(X)[0]
+    
+# check for correlations in the inputs (columns of X, ignoring the constant)
+cc = np.corrcoef(X[np.ix_([1, p - 1], [1, p - 1])], rowvar = False)
 mask = np.ones(cc.shape, dtype = bool)
 np.fill_diagonal(mask, 0)
 if cc[mask].max() > high:
-	print('High correlations present in the inputs, aborting')
+	print('High correlations present in the inputs, regenerating')
 	continue
 
-# check for correlations in the features (rows of X, excluding the constants)                                                                                                                                      
+# check for correlations in the features (rows of X, ignoring the constant)
 cc = np.corrcoef(X[np.ix_([1, p - 1], [1, p - 1])], rowvar = True)
 mask = np.ones(cc.shape, dtype = bool)
 np.fill_diagonal(mask, 0)
 if cc[mask].max() > high:
-	print('High correlations present in the features, aborting')
-	continue
+	print('High correlations present in the features, regenerating')
+continue
 
-y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X)) # generate the labels using the features                    
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X)) # generate the labels using the features    
 ```
 
 Once all of this plays out, we can try to run the math:
 
 ```python
-XtX = np.matmul(Xt, X)
-try:
-	XtXi = inv(XtX)
-except:
-	print('Encountered a singular matrix regardless of the correlations checks')
-	continue
-v = np.diag(XtXi)
-XXX = np.matmul(XtXi, Xt)
-w = np.matmul(XXX, y)
-yp = np.matmul(X, w)
-dof = n - p - 1
-dy = y - yp
-dsq = np.inner(dy, dy) # sum([i**2 for i in dy])                                                                                 
-var = dsq / dof # variance
-sd = sqrt(var) # standard deviation                                      
+    XtX = np.matmul(Xt, X)
+    try:
+        XtXi = inv(XtX)
+    except:
+        print('Encountered a singular matrix regardless of the correlations checks')
+        continue
+    v = np.diag(XtXi)
+    XXX = np.matmul(XtXi, Xt)
+    w = np.matmul(XXX, y)
+    yp = np.matmul(X, w)
+    dy = y - yp
+    dsq = np.inner(dy, dy) # sum([i**2 for i in dy])
+    var = dsq / dof # variance
+    sd = sqrt(var) # standard deviation
+    assert min(v) > 0 # all the vj are positive (that is, the math worked as intended)
 ```
 
 Usually, one assumes that the deviations between the predicted `yp`
@@ -436,39 +439,33 @@ corresponding input in `X` has no effect on the output `y`), we
 compute it's Z-score.
 
 ```python
-if min(v) > 0: # all the vj are positive (that is, the math worked as intended)
-	for j in range(p):
-		z = w[j] / (sd * sqrt(v[j]))
-		print('Index', j, 'got a coefficient', w[j], 'which is non-zero' if chi2.pdf(z, dof) < alpha else 'which is insignificant')
+sqv = sqrt(v[j])
+ss = sd * sqv            
+z = w[j] / ss
+p = chi2.sf(z, dof) # survival function (this feels fishy looking at the numbers, but not sure what is my mistake)
+signif = p < alpha
+print(f'\nCoefficient {coeff[j]:.2f} was estimated as {w[j]:.2f}',
+      'which is significant' if signif else 'but it is insignificant',
+      f'with a p-value of {p:.5f}')
+
 ```
 
 We could use F-scores to compare between models with different subsets
-of features. We can also add confidence interval calculations`with the
-normality hypothesis
+of features. We can also add confidence interval calculations with the
+normality hypothesis by adding a bit of calculations:
 
 ```python
-from scipy.stats import norm
-z1a = norm.ppf(1 - alpha) # gaussian percentile                                     
-```
-by adding a bit of calculations:
-
-```python
-sqv = sqrt(v[j])
-ss = sd * sqv
-z = w[j] / ss
-signif = chi2.pdf(z, dof) < alpha
-print('Index', j, 'got a coefficient', w[j], 'which is non-zero' if signif else 'which is insignificant')
-if signif:
-	width =	z1a * sd
-	low = w[j] - width
-	high = w[j] + width
-	print(f'with a confidence interval [{low}, {high}]')
+width = z1a * sd
+low = w[j] - width
+high = w[j] + width
+print(f'with a confidence interval [{low}, {high}]', 
+      'that contains zero' if low < 0 and high > 0 else '')
 ```
 
 Note how these intervals are _huge_ when the model sucks. Always
 **look** at your results and question them.
 
-If we have **multiple** outputs, meaning that  `y` is now a matrix,
+If we have **multiple** outputs, meaning that  `Y` is a matrix,
 too, (pending; I need to make the above models not suck and then I can
 move forward)
 
@@ -476,9 +473,10 @@ move forward)
 ### Homework 3
 
 Repeat the steps of the prostate cancer example in Section 3.2.1 first
-with the book's data set and then with data from your own
-project. Calculate also the p-values and the confidence intervals for
-the model's coaefficients in both cases.
+as a univariate problem using the book's data set and then as a
+multi-variate problem with data from your own project. Calculate also
+the p-values and the confidence intervals for the model's
+coefficients in both cases.
 
 
 
