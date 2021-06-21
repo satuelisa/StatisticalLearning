@@ -15,11 +15,16 @@ z1a = norm.ppf(1 - alpha) # gaussian percentile
 # more inputs this time so that n - 1 > p 
 n = 100
 p = 10
-print('f{n} inputs, {p} features')
+print(f'{n} inputs, {p} features')
 dof = n - p - 1 # degrees of freedom
 coeff = uniform(size = p, low = -5, high = 5) # coefficients of features (model)
 coeff[p // 2] = 0 # make the middle one irrelevant
 constants = np.ones((1, n))
+
+def rss(X, y, w):
+    yp = np.matmul(X, w) # n predictions, one per input
+    yyp = y - yp 
+    return np.matmul(yyp.T, yyp)  
 
 def gen(x): # a bit more randomness this time and use integers
     count = np.shape(x)[0]
@@ -29,7 +34,7 @@ def gen(x): # a bit more randomness this time and use integers
 while True: # iterate until we get data that yields a model
     features = uniform(low = -50, high = 50, size = (p - 1, n))
     Xt = np.vstack((constants, features)) # put the constants on the top row
-    X = Xt.T # put the inputs in columnns
+    X = Xt.T # put the inputs in columns
     assert p == np.shape(X)[1]
     assert n == np.shape(X)[0]
     
@@ -59,6 +64,8 @@ while True: # iterate until we get data that yields a model
     v = np.diag(XtXi)
     XXX = np.matmul(XtXi, Xt)
     w = np.matmul(XXX, y)
+    rss1 = rss(X, y, w)
+    rd = rss1 / dof
     yp = np.matmul(X, w)
     dy = y - yp
     dsq = np.inner(dy, dy) # sum([i**2 for i in dy])
@@ -69,7 +76,12 @@ while True: # iterate until we get data that yields a model
         sqv = sqrt(v[j])
         ss = sd * sqv            
         z = w[j] / ss
-        p = chi2.sf(z, dof) # survival function (this feels fishy looking at the numbers, but not sure what is my mistake)
+        excl = np.copy(w)
+        excl[j] = 0 # constrain this one to zero
+        rss0 = rss(X, y, excl) # a model without this feature
+        f = (rss0 - rss1) / rd # just one parameter was excluded
+        print(z, f) # these should be equal but I am clearly doing something wrong (lemme know if you know what that is)
+        p = chi2.sf(f, dof) # survival function (assuming f == z) 
         signif = p < alpha
         print(f'\nCoefficient {coeff[j]:.2f} was estimated as {w[j]:.2f}',
               'which is significant' if signif else 'but it is insignificant',

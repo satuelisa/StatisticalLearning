@@ -436,21 +436,24 @@ variance is from a chi-squared distribution (`n - p - 1` DoF),
 allowing for the calculation of confidence intervals.  To
 statistically check if a specific weight in `w` is zero (that is, the
 corresponding input in `X` has no effect on the output `y`), we
-compute it's Z-score.
+compute it's Z-score (or F-score as feature-exclusion):
 
 ```python
 sqv = sqrt(v[j])
 ss = sd * sqv            
 z = w[j] / ss
-p = chi2.sf(z, dof) # survival function (this feels fishy looking at the numbers, but not sure what is my mistake)
+excl = np.copy(w)
+excl[j] = 0 # constrain this one to zero
+rss0 = rss(X, y, excl) # a model without this feature
+f = (rss0 - rss1) / rd # just one parameter was excluded
+p = chi2.sf(f, dof) # survival function (assuming f == z) 
 signif = p < alpha
 print(f'\nCoefficient {coeff[j]:.2f} was estimated as {w[j]:.2f}',
       'which is significant' if signif else 'but it is insignificant',
       f'with a p-value of {p:.5f}')
-
 ```
 
-We could use F-scores to compare between models with different subsets
+We can use F-scores to compare between models with different subsets
 of features. We can also add confidence interval calculations with the
 normality hypothesis by adding a bit of calculations:
 
@@ -462,13 +465,53 @@ print(f'with a confidence interval [{low}, {high}]',
       'that contains zero' if low < 0 and high > 0 else '')
 ```
 
-Note how these intervals are _huge_ when the model sucks. Always
-**look** at your results and question them.
-
 If we have **multiple** outputs, meaning that  `Y` is a matrix,
-too, (pending; I need to make the above models not suck and then I can
-move forward)
+too. This happens in [`multreg.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/multreg.py)
+using the math from Section 3.2.3 using `from numpy.linalg import qr, inv` for the QR-decomposition.
 
+First, we need to make the generator create multiple outputs per input:
+
+```python
+k = 3 
+print(f'{n} inputs, {p} features')
+coeff = uniform(size = (k, p), low = -5, high = 5) # coefficients for the k output
+
+def gen(x): # a bit more randomness this time and use integers
+    count = np.shape(x)[0]
+    noise = normal(loc = 0, scale = 0.1, size = count).tolist()
+    return [sum([coeff[j, i] * x[i] + noise[i] for i in range(count)]) for j in range(k)]
+```
+Then we generate the labels and throw in the math:
+
+```python
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
+Q, R = qr(X)
+Ri = inv(R)
+Qt = Q.T
+RiQt = np.matmul(Ri, Qt)
+w = np.matmul(RiQt, y)
+for i in range(k):    
+    for j in range(p):
+        print(f'Coefficient {coeff[i, j]:.2f} of output {i + 1} was estimated as {w[j, i]:.2f}')
+```
+
+We can also make predictions:
+
+```python
+QQt = np.matmul(Q, Qt)
+yp = np.matmul(QQt, y)
+for i in range(n):
+    print(f'Expected {y[i, :]}, predicted {yp[i, :]}')
+```
+
+Please read with careful thought the sections on subset-selection
+methods, as it is important to stick to the smallest reasonable model
+instead of simply shoving in every feature and interaction one can
+think of. I know it's a lot of text, but this is stuff you need to be
+familiar with, although in practice you will usually employ an
+existing library for all of this. For python code on the selection
+methods, check out the thorough examples by
+[Oleszak](https://towardsdatascience.com/a-comparison-of-shrinkage-and-selection-methods-for-linear-regression-ee4dd3a71f16).
 
 ### Homework 3
 
@@ -476,7 +519,7 @@ Repeat the steps of the prostate cancer example in Section 3.2.1 first
 as a univariate problem using the book's data set and then as a
 multi-variate problem with data from your own project. Calculate also
 the p-values and the confidence intervals for the model's
-coefficients in both cases.
+coefficients for the uni-variate version.
 
 
 
