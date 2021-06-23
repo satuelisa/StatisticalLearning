@@ -7,7 +7,7 @@ def rss(X, y, w):
     yyp = y - yp 
     return np.matmul(yyp.T, yyp)  
 
-Xt = np.array([[1, 1, 1 , 1, 1, 1, 1, 1], # the constants
+Xt = np.array([[1, 1, 1, 1, 1, 1, 1, 1], # the constants
                [2, 5, 7, 3, 5, 2, 1, 2], # feature 1
                [8, 6, 3, 1, 9, 4, 3, 2], # feature 2
                [2, 3, 5, 2, 4, 5, 7, 3], # feature 3

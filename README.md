@@ -22,11 +22,13 @@ experience and more pain on my part.
 + [Chapter 1: Introduction](#introduction)
   * [Homework 1](#homework-1)
 + [Chapter 2: Supervised learning](#supervised-learning)
-  * [Section 2.2: Least squares for linear  models](#least-squares-for-linear-models)
+  * [Section 2.2: Least squares for linear models](#least-squares-for-linear-models)
   * [Section 2.3: Nearest neighbors](#nearest-neighbors)
   * [Homework 2](#homework-2)
 + [Chapter 3: Linear regression](#linear-regression)
   * [Homework 3](#homework-3)
++ [Chapter 4: Linear methods for classification](#classification)
+  * [Homework 4](#homework-4)
 
 ## Introduction
 
@@ -515,12 +517,144 @@ methods, check out the thorough examples by
 
 ### Homework 3
 
-Repeat the steps of the prostate cancer example in Section 3.2.1 first
-as a univariate problem using the book's data set and then as a
-multi-variate problem with data from your own project. Calculate also
-the p-values and the confidence intervals for the model's coefficients
-for the uni-variate version. Experiment, using libraries, also with
-subset selection.
+Repeat the steps of the prostate cancer example in Section 3.2.1 using
+Python, first as a univariate problem using the book's data set and
+then as a multi-variate problem with data from your own
+project. Calculate also the p-values and the confidence intervals for
+the model's coefficients for the uni-variate version. Experiment,
+using libraries, also with subset selection.
 
+## Classification
 
+Now the predictor takes discrete values (each input gets assigned to a
+class). The task is to divide the input space into regions that
+correspond to each class. In a linear case, the class boundaries are
+hyperplanes.
 
+When using regression, we can compute the weights `w` as before and
+then obtain posterior probabilities. The whole thing is at 
+[`postprob.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/postprob.py):
+
+First we make a model with integer labels 1 and 2.
+```python
+import numpy as np  
+from math import exp
+from numpy.linalg import qr, inv 
+from numpy.random import normal
+
+np.set_printoptions(precision = 0, suppress = True)
+Xt = np.array([[1, 1, 1, 1, 1, 1, 1, 1], # constant
+               [2, 5, 7, 3, 5, 2, 1, 2], # feature 1
+               [8, 6, 3, 1, 9, 4, 3, 2], # feature 2
+               [2, 3, 5, 2, 4, 5, 7, 3], # feature 3
+               [3, 4, 5, 4, 4, 8, 8, 2]]) # feature 4
+X = Xt.T
+coeff = np.array([0, 1, 2, 3, 4]) # zero weight for the constant
+threshold = 30 # make two classes
+
+def gen(x): # a bit more randomness this time and use integers
+    count = np.shape(x)[0]
+    noise = normal(loc = 0, scale = 0.1, size = count).tolist()
+    value = sum([coeff[i] * x[i] + noise[i] for i in range(count)])
+    return (value > threshold) + 1 # class one or class two
+
+intended = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
+print('Intended labels')
+print(intended)
+```
+
+Then we make indicator vectors (true versus false) for each of the two classes:
+
+```python
+y = np.array([(1.0 * (intended == 1)), (1.0 * (intended == 2))]).T
+```
+
+With those, we recycle the multiregression math with the QR decomposition:
+
+```python
+Q, R = qr(X)
+Ri = inv(R)
+Qt = Q.T
+RiQt = np.matmul(Ri, Qt)
+w = np.matmul(RiQt, y)
+```
+
+We can also make and round predictions directly as before:
+
+```python
+QQt = np.matmul(Q, Qt)
+yp = np.matmul(QQt, y)
+print('Assigned indicators')
+print(y.T)
+print('Predicted indicators (rounded)')
+print(np.fabs(np.round(yp, decimals = 0)).T)
+```
+
+but the new math allows us to compute for each class the probability that the input belongs to it:
+
+```python
+wt = w.T
+for c in [1, 2]: # for both classes
+    b = wt[c - 1]
+    print('Class', c)
+    for i in range(len(intended)):
+        x = X[i]
+        yd = intended[i]
+        eb = exp(np.matmul(b, x)) 
+        ed = 1 + eb
+        pThis = eb / ed
+        pOther = 1 / ed
+        ok = pThis > pOther
+        print(f'{x} should be {yd}: this {pThis:.2f} vs. other {pOther:.2f} ->', 'right' if ok else 'wrong')
+```
+
+Most of the input are correctly labelelled regardless of which class
+is used to compute the posterior probabilities. As the book points
+out, in practice, class boundaries have no particular reason to be
+linear. 
+
+We can also predict without explicitly computing the weights as in Equation (4.3) of the book
+[`indmat.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/indmat.py), using the same `X`
+
+```python
+y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
+Y = np.array([(1.0 * (y == 1)), (1.0 * (y == 2))]).T
+XtXi = inv(np.matmul(Xt, X))
+XXtXi = np.matmul(X, XtXi)
+XXtXiXt = np.matmul(XXtXi, Xt)
+Yp = np.matmul(XXtXiXt, Y)
+print('Assigned indicators')
+print(Y.T)
+print('Predicted indicators')
+print(np.fabs(Yp.T)) # the -0 bother me so I use fabs
+```
+
+If the classes share a covariance matrix, we can apply _linear
+discriminant analysis_ (LDA) to compute linear discriminant functions
+to obtain the class boundaries. For two classes, this is the same as
+using the above calculations with an indicator matrix, but not in the
+general case. When the covariance matrix cannot be assumed to be the
+same, _quadratic discriminant functions_ arise. An option to LDA/QDA
+is _regularized discriminant analysis_ (RDA). Subspace projections may
+also come in handy.
+
+**Logistic regression** for classes `1, 2, ..., k` refers to modelling
+logit transformations (logarithm of the posterior probability of a
+specific class `i` normalized by the posterior probability of the last
+class `k`) with linear functions in the input space, using a linear
+function `ci + bi.T x` where `ci` is the constant term and `bi` the
+weight vector for class `i`, with such an equation for each `i < k`
+and then iteratively solving for the values of the `ci` and the
+vectors `bi`. This may or may not converge and reles on an initial
+guess for the weights. A regularized version exists for this as well.
+
+Please read all of Chapter 4 carefully. Also perceptrons (already
+mentioned before, the ones we worked with in the simulation class) are
+discussed in Section 4.5.1 in the context of hyperplane separation
+(ideally, the decision boundary would be as separated from the
+training inputs as it can).
+
+### Homework 4
+
+Pick one of the examples of the chapter that use the data of the book
+and replicate it in Python. Then, apply the steps in your own data. 
