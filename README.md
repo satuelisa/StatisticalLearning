@@ -1,7 +1,7 @@
 # Statistical Learning
 
-These are my class notes for
-students
+These are my class notes
+for
 [my automated learning graduate course](https://elisa.dyndns-web.com/teaching/sys/apraut/) based
 on the
 textbook
@@ -29,6 +29,8 @@ experience and more pain on my part.
   * [Homework 3](#homework-3)
 + [Chapter 4: Linear methods for classification](#classification)
   * [Homework 4](#homework-4)
++ [Chapter 5: Basis expansions](#basis-expansions)
+  * [Homework 5](#homework-5)
 
 ## Introduction
 
@@ -658,3 +660,95 @@ training inputs as it can).
 
 Pick one of the examples of the chapter that use the data of the book
 and replicate it in Python. Then, apply the steps in your own data. 
+
+## Basis expansions
+
+It is intuitively clear that real-world relationships between factors
+in data are unlikely to be linear. One work-around that is compatible
+with the math we have used thus far is including new features that are
+transformations of the original ones (or their combinations). This, of
+course, makes the feature-selection and model-minimization algorithms
+even more relevant as we are now blowing the number of possible
+features sky-high.
+
+The transformations could be specific functions (attempted with a
+Tukey ladder, for example) such as logarithms or powers, but _basis
+expansions_ is a more flexible way to get this done. This chapter
+deals with using piecewise polynomials and splines as also touches the
+use of wavelets.
+
+It is common to doing this assuming **additivity**: each _model_
+feature is a linear combination of basis functions applied to the
+_raw_ features, among a set of `p` basis functions. Basis functions
+that do not result in a significant contribution to the model can be
+discarded with selection methods, and also the coefficients of the
+linear combination could be restricted (this is called
+_regularization_).
+
+In a piecewise-linear function, the book refers to the points at which
+the pieces change as _knots_ (do not confuse this with the
+mathematical concept of a knot). **Splines** of order `m` are
+piecewise-polynomials with `m - 2` continuous derivatives; cubic (`m =
+3`) splines often result in polynomials where the knot locations are
+no longer easy to spot to the naked eye. If the _locations_ of the
+knots are fixed (instead of flexible), these are called "regression
+splines". Play with the example
+in
+[`spline.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/spline.py) for
+a bit, varying the magnitude of the noise in the calls to `normal` and
+the step size (the third parameter of `np.arange(-7, 7, 0.05)`) to see
+how the spline behaves. Also mess with the function itself. We use
+`from scipy.interpolate import CubicSpline` to create the spline.
+Note that `CubicSpline` wants an ordered `x`, so we  **have to** sort
+after we add the noise. The figure that opens shows the data with red
+dots, a green dashed line for the function we used, and two splines:
+one fitted to the "model" and another one fitted to the noisy version
+of the coordinates.
+
+````python
+plt.scatter(x, y, c = 'red') # data
+plt.plot(xt, yt, c = 'blue', linestyle = 'dashed') # pure model
+plt.plot(x, s(x), c = 'green') # clean spline
+plt.plot(xt, s(xt), c = 'black') # noisy spline
+```
+
+Undesirable behaviour at boundaries can be somewhat tamed by using
+_natural_ splines 
+([`natural.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/natural.py)):
+```python
+s = CubicSpline(x, y) # as before, the default is 'not-a-knot'
+ns = CubicSpline(x, y, bc_type = 'natural') # fit a NATURAL cubic spline
+
+plt.scatter(x, y, c = 'gray', s = 10) # data now in GRAY with small dots
+plt.plot(xt, s(xt), linestyle = 'dashed', c = 'red') # the default one in RED
+plt.plot(xt, ns(xt), c = 'black') # natural spline now drawn in BLACK
+```
+
+If there is a difference, it appears at the edges of the plot. Rerun
+until you've seen it at both ends (the random noise affects the spline
+computations so the outcome differs at each execution).
+
+There are many fine details to applying this, so it is important to
+read all of Chapter 5. 
+
+An alterative family of basis functions are _wavelets_ that are
+orthonormal. There is
+a [library for that](https://pywavelets.readthedocs.io/en/latest/).
+
+### Homework 5
+
+Fit splines into single features in your project data. Explore options
+to obtain the best fit.
+
+## Chapter 6
+
+## Chapter 7
+
+## Chapter 8
+
+## Chapter 9
+
+To do this with several features, look into MARS
+(https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/)
+using `scikit-learn`.
+
