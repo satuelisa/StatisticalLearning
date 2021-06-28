@@ -31,6 +31,8 @@ experience and more pain on my part.
   * [Homework 4](#homework-4)
 + [Chapter 5: Basis expansions](#basis-expansions)
   * [Homework 5](#homework-5)
++ [Chapter 6: Kernel smoothing](#kernel-smoothing)
+  * [Homework 6](#homework-6)
 
 ## Introduction
 
@@ -740,15 +742,82 @@ a [library for that](https://pywavelets.readthedocs.io/en/latest/).
 Fit splines into single features in your project data. Explore options
 to obtain the best fit.
 
-## Chapter 6
+## Kernel smoothing
+
+Instead of fitting one model to all of the data, we can fit simple,
+local models for each point we are interested in; the book calls these
+_query points_. The way "locality" is defined is by assigining a
+function that sets a weight for each data point based on its distance
+from the query point. These weight-assignment functions are called
+**kernels** and are usually parametrized in a way that controls how
+wide the neighborhood will be. Kernels are the topic of Chapter 12.
+
+This is like the simple thing we did for the nearest-neighbor
+averaging method in
+[`knn.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/knn.py)
+in Chapter 2. To illustrate the downside of the simple procedure,
+let's use KNN to estimate a curve like the ones we used for the spline
+examples in the previous chapter; this code is in
+[`knn2.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/knn2.py). First
+we create data and pick some query points at random:
+
+```python
+low = -7
+high = 12
+xt = np.arange(low, high, 0.2) 
+n = len(xt)
+m = 0.1
+x = np.sort(xt + normal(size = n, scale = m)) 
+y = np.cos(xt) - 0.2 * xt + normal(size = n, scale = m) # add noise
+xq = np.sort(uniform(low, high, size = n // 4)) # sorted
+```
+
+Then we pick the `k` closest data points (in terms of `x` as we do not
+know the `y`, since we are trying to _estimate_ it) and use their average as the estimate for the corresponding `y`:
+
+``python
+yq = []
+k = 5 
+for point in xq: # local models
+    nd = [float('inf')] * k
+    ny = [None] * k 
+    for known in range(n):
+        d = fabs(point - x[known]) # how far is the observation
+        i = np.argmax(nd)
+        if d < nd[i]: # if smaller than the largest of the stored
+            nd[i] = d # replace that distance
+            ny[i] = y[known]
+    yq.append(sum(ny) / k)
+```
+
+The curve resulting by connecting the query point estimates is, of
+course, generally discontinuous, as expected. Throwing in some more
+math, we can patch the existing math:
+
+(pending)
+
+### Homework 6
 
 ## Chapter 7
 
+### Homework 7
+
 ## Chapter 8
 
-## Chapter 9
+### Homework 8
+
+## MARS
+
+### Homework 9
 
 To do this with several features, look into MARS
 (https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/)
 using `scikit-learn`.
 
+## Chapter 10
+
+## Chapter 11
+
+## Kernels
+
+## Chapter 13
