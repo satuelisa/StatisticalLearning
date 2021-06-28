@@ -705,7 +705,7 @@ dots, a green dashed line for the function we used, and two splines:
 one fitted to the "model" and another one fitted to the noisy version
 of the coordinates.
 
-````python
+```python
 plt.scatter(x, y, c = 'red') # data
 plt.plot(xt, yt, c = 'blue', linestyle = 'dashed') # pure model
 plt.plot(x, s(x), c = 'green') # clean spline
