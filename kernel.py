@@ -12,14 +12,14 @@ def kernel(qp, dp, lmd = 0.2): # Eq. (6.3)
 
 low = -7
 high = 12
-xt = np.arange(low, high, 0.2) 
+xt = np.arange(low, high, 0.1) 
 n = len(xt)
 m = 0.1
 x = np.sort(xt + normal(size = n, scale = m)) 
 y = np.cos(xt) - 0.2 * xt + normal(size = n, scale = m) 
-xq = np.sort(uniform(low, high, size = n // 4)) # sorted for the visuals
+xq = np.sort(uniform(low, high, size = n // 2)) # sorted for the visuals
 yq = []
-k = 5
+k = 10
 tiny = 0.001
 for point in xq:
     nd = [float('inf')] * k
@@ -32,10 +32,13 @@ for point in xq:
             nd[i] = d # replace that distance
             nx[i] = x[known]
             ny[i] = y[known]
-    bottom = sum([kernel(point, neighbor) for neighbor in nx])
-    if fabs(bottom) > tiny: # do NOT divide by zero
-        top = sum([ny[i] * kernel(point, neighbor) for neighbor in nx])
-        yq.append(top / bottom)
+    w =  [kernel(point, neighbor) for neighbor in nx] # apply the kernel 
+    bottom = sum(w) # the normalizer
+    if fabs(bottom) > tiny: 
+        top = sum((w * yv) for (w, yv) in zip(w, ny)) # weighted sum of the y values
+        yq.append(top / bottom) # store the obtained value for this point
+    else: # do NOT divide by zero
+        yq.append(None) # no value obtained for this point (omit in drawing)
 
 plt.plot(xq, yq, c = 'orange', linewidth = 2, linestyle = 'dashed') # model
 plt.scatter(xq, yq, c = 'red', s = 15) # query points

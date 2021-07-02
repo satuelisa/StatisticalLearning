@@ -764,20 +764,21 @@ we create data and pick some query points at random:
 ```python
 low = -7
 high = 12
-xt = np.arange(low, high, 0.2) 
+xt = np.arange(low, high, 0.1) 
 n = len(xt)
 m = 0.1
 x = np.sort(xt + normal(size = n, scale = m)) 
 y = np.cos(xt) - 0.2 * xt + normal(size = n, scale = m) # add noise
-xq = np.sort(uniform(low, high, size = n // 4)) # sorted
+xq = np.sort(uniform(low, high, size = n // 2)) # sorted
 ```
 
 Then we pick the `k` closest data points (in terms of `x` as we do not
-know the `y`, since we are trying to _estimate_ it) and use their average as the estimate for the corresponding `y`:
+know the `y`, since we are trying to _estimate_ it) and use their
+average as the estimate for the corresponding `y`:
 
-``python
+```python
 yq = []
-k = 5 
+k = 10
 for point in xq: # local models
     nd = [float('inf')] * k
     ny = [None] * k 
@@ -792,11 +793,56 @@ for point in xq: # local models
 
 The curve resulting by connecting the query point estimates is, of
 course, generally discontinuous, as expected. Throwing in some more
-math, we can patch the existing math:
+math, we can patch the existing math for a smoother result. First we
+define the auxiliary function and the kernel itself:
 
-(pending)
+```python
+def dt(t): # Eq. (6.4)
+    return (3/4) * (1 - t**2) if fabs(t) <= 1 else 0
+
+def kernel(qp, dp, lmd = 0.2): # Eq. (6.3)
+    return dt(fabs(qp - dp) / lmd)
+```
+
+and then we use these to calculate the `y` estimates as weighted averages 
+(the whole thing is at
+[`kernel.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/kernel.py):
+
+```python
+tiny = 0.001
+for point in xq:
+    nd = [float('inf')] * k
+    nx = [None] * k
+    ny = [None] * k
+    for known in range(n):
+        d = fabs(point - x[known]) # how far is the observation
+        i = np.argmax(nd)
+        if d < nd[i]: # if smaller than the largest of the stored
+            nd[i] = d # replace that distance
+            nx[i] = x[known]
+            ny[i] = y[known]
+    w =  [kernel(point, neighbor) for neighbor in nx] # apply the kernel 
+    bottom = sum(w) # the normalizer
+    if fabs(bottom) > tiny: 
+        top = sum((w * yv) for (w, yv) in zip(w, ny)) # weighted sum of the y values
+        yq.append(top / bottom) # store the obtained value for this point
+    else: # do NOT divide by zero
+        yq.append(None) # no value obtained for this point (omit in drawing)
+```
+
+Of course we could use another `dt` like that of Eq. (6.7) or a
+different kernel. Now, applying this same idea to linear or even
+polynomial regression, we could also perform that in a local
+neighborhood, using a kernel to assign weights to the known data
+points within that local neighborhood. Much of this is playing with
+the parameters (like `lmd` in `kernel`) to obtain the best possible
+model.
 
 ### Homework 6
+
+You guessed it. That's the homework. Build some local regression model
+for your data and adjust the parameters. Remember to read all of
+Chapter 6 first to get as many ideas as possible. 
 
 ## Chapter 7
 
