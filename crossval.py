@@ -1,26 +1,34 @@
 import numpy as np
 from numpy.linalg import qr, inv
-from scipy.stats import norm
 from numpy.random import normal, uniform
 
-np.seterr(all='raise') # see the origin of all troubles
+np.seterr(all='raise') 
 np.set_printoptions(precision = 2, suppress = True)
 
-high = 0.95 # correlation threshold
+high = 0.95 
+alpha = 0.01 
 
-n = 10
+c = 5 # cross-validate five times
+n = c * 20 # use 80 samples to train and 20 to validate on each iteration
 p = 5
-# also multiple outputs now
-k = 3 
-print(f'{n} inputs, {p} features')
-coeff = uniform(size = (k, p), low = -5, high = 5) # coefficients for the k outputs
+coeff = uniform(size = p, low = -15, high = 15) 
 constants = np.ones((1, n))
 
-def gen(x): # a bit more randomness this time 
+def predict(X, y):
+    Q, R = qr(X)
+    Ri = inv(R)
+    Qt = Q.T
+    RiQt = np.matmul(Ri, Qt)
+    w = np.matmul(RiQt, y)
+    QQt = np.matmul(Q, Qt)
+    return np.matmul(QQt, y)
+
+def gen(x): 
     count = np.shape(x)[0]
     noise = normal(loc = 0, scale = 0.1, size = count).tolist()
-    return [sum([coeff[j, i] * x[i] + noise[i] for i in range(count)]) for j in range(k)]
+    return sum([coeff[i] * x[i] + noise[i] for i in range(count)])
 
+features = None
 while True: # iterate until we get data that yields a model
     features = uniform(low = -50, high = 50, size = (p - 1, n))
     Xt = np.vstack((constants, features)) # put the constants on the top row
@@ -37,19 +45,19 @@ while True: # iterate until we get data that yields a model
     if cc[mask].max() > high:
         print('High correlations present in the features, regenerating')
         continue
-    y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X)) # generate the labels using the features    
-    Q, R = qr(X)
-    Ri = inv(R)
-    Qt = Q.T
-    RiQt = np.matmul(Ri, Qt)
-    w = np.matmul(RiQt, y)
-    for i in range(k):    
-        for j in range(p):
-            print(f'Coefficient {coeff[i, j]:.2f} of output {i + 1} was estimated as {w[j, i]:.2f}')
-    QQt = np.matmul(Q, Qt)
-    yp = np.matmul(QQt, y)
-    for i in range(n):
-        print(f'Expected {y[i, :]}, predicted {yp[i, :]}')
-    break # done
+    y = np.asarray(np.apply_along_axis(gen, axis = 1, arr = X))
+    break
+
+e = list() # errors go here
+for r in range(c):
+    # since they are randomly generated, take every cth column starting at r        
+    Xc = X[r::c] 
+    yc = y[r::c]
+    yp = predict(Xc, yc)
+    diff = (yc - yp)
+    e.append(np.inner(diff, diff)) # SSQ
+print('Iterations', np.array(e))
+print('Estimated prediction error', sum(e) / c) # average over them
+    
 
 

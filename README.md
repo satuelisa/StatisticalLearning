@@ -33,6 +33,8 @@ experience and more pain on my part.
   * [Homework 5](#homework-5)
 + [Chapter 6: Kernel smoothing](#kernel-smoothing)
   * [Homework 6](#homework-6)
++ [Chapter 7: Model assessment](#model-assessment)
+  * [Homework 7](#homework-7)
 
 ## Introduction
 
@@ -844,9 +846,160 @@ You guessed it. That's the homework. Build some local regression model
 for your data and adjust the parameters. Remember to read all of
 Chapter 6 first to get as many ideas as possible. 
 
-## Chapter 7
+## Model assessment
+
+Suppose we have tons of data. We first separate our available data, at
+random, into three non-overlapping sets:
++ Training set (about 50 to 70 %)
++ Validation set (about 15 to 25 %)
++ Test set (about 15 to 25 %) and life is sort of easy from there
+on. Use the training set to build a model, use the validation set to
+adjust any parameters or details that might need tuning, and then
+assess the model performance and quality in terms of the test set
+without making any tweaks to the model based on those results.
+
+The seventh chapter is about what do when you do **not** in fact have
+this luxury and you have to validate analytically or using the same
+data repeatedly (like cross-validation and bootstrap).
+
+So, if we have tons of potential models with various different subsets
+and transformations of the features, using different techniques, how
+do we quentify how good these models are and how would be go about
+choosing one in particular to actually use for whatever application we
+have in mind.
+
+Let `Y` again be the target variable (i.e., what we are trying to
+model) and `X` the inputs (i.e., in terms of what we are building the
+model for `Y`). Denote by `f(X)` a prediction model that produces the
+estimates for `Y` as a function of `X`. 
+
+A *loss function* `L(Y, f(X))` is a measurement of the prediction
+error. Typical examples include the _squared_ error `(Y - f(X))**2`
+and the _absolute_ error `np.abs(Y - f(X))`. For categorical data, we
+can go with an indicator function that returns zero when the labels
+match (intended versus assigned) and one otherwise or a log-likelihood
+version such as _deviance_ as in Equation (7,6).
+
+In terms of such a function `L`, we can define _generalization error_
+(a.k.a. _test error_) as the expected value of `L`, conditioned on a
+(specific, fixed) test set `T`, where the inputs of `T` are _not_ the
+ones we included in the traning set `X` that was used to build the
+model in the first place.  
+
+The expected value of this expectation over possible test sets is the
+_expected prediction error_. Remember that when you are dealing with
+data instead of theory, averaging over several independent samples is
+usually a decent way to estimate an expected value of a quantity. In
+effect, if we average the loss over a set of independent training
+sets, we get what is called _training error_.
+
+If you recycle any of the inputs in `X` in `T`, you are likely to see
+a lower error, but it does not imply you're "doing better" --- of
+course the error is lower if you test with the same data you modeled
+on. This is **not** a good thing. You want a low error on _previously
+unseen_ data. The difference of errors when measured  
+(1) on actual validation or testing data (larger error) and (2) on the
+training data itself (smaller error) is called the _optimism_ of the
+model. Analytically, optimism increases linearly with the number of
+features we use (raw or transformed). If we estimate optism
+(analytically) and then add it to the training error, we get an
+estimate for the actual prediction error. This is what is discussed in
+Section 7.5 of the book.
+
+We assume the error to be a a sum of three factors: an _irreducible
+error_ plus _bias_ (squared) plus _variance_, the first of which is
+the variability present in the phenomenon that is being modeled, the
+second measures how far the estimated mean is from the true mean, amd
+the third measures how the estimates deviate from their mean. Complex
+models tend to achieve a lower bias (a more precise mean) but with the
+cost of a higher variance. Section 7.6 discusses how to determine the
+"effective number of parameters" for a model, whereas Section 7.8
+describes the "minimum description length" which is another approach
+for the same issue: how to quantify model complexity. There are
+sections on Bayesian approaches as well as heavier stuff, too, for the
+mathematically oriented.
+
+The book provides us with analytical expressions for this sum for
+linear KNN and ridge regression methods. Tuning a model parameter
+results in a bias-variance trade-off: lowering one results in an
+increase in the other.
+
+A very popular way to go about prediction error estimation is called
+**cross-validation** that estimates, in a direct manner, the expected
+errorover independent test samples. First, take your data and split it
+into `c` non-overlapping subsets. Then, iterate `c` times as follows:
+set the `c`th subset aside for validation and use the other `c - 1`
+subsets, combined, as training data. Average over the loss functions
+to obtain an estimate for the prediction error. Yes, you should try
+different values of `c` to find out which one works with any
+particular data-model combination. It is imporant to carry out the
+entire process `c` times with the resulting test sets, instead of
+building once and then attempting to "only validate" multiple times
+(read Section 7.10 to understand why it is bad to limit it to just
+some of the steps). A conceptual toy example is available at
+[`crossval.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/crossval.py)
+with `c = 5` and `n = c * 20` meaning that it uses 80 samples to train
+and 20 to validate on each iteration. We use the same math as before
+for linear regression to compute predictions and then average over their errors:
+
+```python
+e = list() # errors go here
+for r in range(c):
+    # since they are randomly generated, take every cth column starting at r 
+    Xc = X[r::c] 
+    yc = y[r::c]
+    yp = predict(Xc, yc)
+    diff = (yc - yp)
+    e.append(np.inner(diff, diff)) # SSQ
+print('Iterations', np.array(e))
+print('Estimated prediction error', sum(e) / c) # average over them
+```
+Another common way to go about this is **bootstrap**. Here, we
+generate `b` random samples of the same size than the original
+training set, but _with replacement_, meaning that the individual
+inputs may (and usually will) repeat. We fit the model to these "fake"
+data sets and compare the fits, but simply averaging over the losses
+here suffers from the fallacy of using the same data for testing and
+validation, resulting in "artifically low" error estimates. Read
+Section 7.11 for more details on this.
+
+A conceptual toy example for this as well is available at
+[`bootstrap.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/bootstrap.py)
+with `b = 5` and `n = 100` meaning that it uses 100 samples to train a
+base model and then samples from these a set of `n` but _with_
+replacement for each of the `b` replicas on each iteration. Note that
+the same math we used for linear regression to compute predictions
+**will not work** as sampling with replacement makes the matrix
+singular so we will use a `sklearn.linear_model` implementation for
+`LinearRegression` instead to circumvent this issue. The toy example
+does _not_ actually compute any errors or perform validation; it
+simply builds the models and spits out the coefficients so you can
+stare at them and observe that they do in fact vary. We use `choices`
+from `random` to sample with replacement.
+
+```python
+baseline = LinearRegression().fit(X, y) 
+print(baseline.coef_) 
+
+pos = [i for i in range(n)]
+for r in range(b): 
+    Xb = np.zeros((n, p))
+    yb = np.zeros(n)
+    i = 0
+    for s in choices(pos, k = n): 
+        Xb[i, :] = X[s, :]
+        yb[i] = y[s]
+    model = LinearRegression().fit(Xb, yb) 
+    print(model.coef_) # replica model
+```
+
+Also read the last section of the chapter before jumping to the homework.
 
 ### Homework 7
+
+You guessed it again, you clever devil: apply both cross-validation
+and bootstrap to your project data to study how variable your results
+are when you switch the test set around.
 
 ## Chapter 8
 
