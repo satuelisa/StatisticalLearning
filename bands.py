@@ -60,11 +60,14 @@ for r in range(b):
         high[i] = max(high[i], prediction)
 
 plt.rcParams.update({'text.color': 'green',
+                     'xtick.color': 'green',
+                     'ytick.color': 'green',
                      'axes.labelcolor': 'green',
-                     'axes.facecolor':  'none' })        
+                     'axes.edgecolor': 'green',
+                     'axes.facecolor':  'none' })
 plt.xlabel('Input index')
 plt.ylabel('Prediction bands')
-plt.vlines(pos, low, high, zorder = 1) # behind
+plt.vlines(pos, low, high, colors = 'gray', zorder = 1) # behind
 plt.scatter(pos, low, c = 'red', zorder = 2) # front
 plt.scatter(pos, high, c = 'blue', zorder = 2) # front
 plt.savefig('bands.png', transparent = True)

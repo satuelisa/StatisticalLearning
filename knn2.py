@@ -29,7 +29,10 @@ for point in xq: # local models
     yq.append(sum(ny) / k)
 
 plt.rcParams.update({'text.color': 'green',
+                     'xtick.color': 'green',
+                     'ytick.color': 'green',
                      'axes.labelcolor': 'green',
+                     'axes.edgecolor': 'green',
                      'axes.facecolor':  'none' })
 plt.plot(xq, yq, c = 'orange', linewidth = 2, linestyle = 'dashed') # model
 plt.scatter(xq, yq, c = 'red', s = 15) # query points
