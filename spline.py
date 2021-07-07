@@ -4,7 +4,7 @@ from numpy.random import normal
 import matplotlib.pyplot as plt
 import numpy as np
 
-figure(figsize = (12, 8), dpi = 100)
+figure(figsize = (6, 4), dpi = 100)
 
 xt = np.arange(-3, 3, 0.1) # true x coordinates
 n = len(xt)
@@ -21,8 +21,8 @@ plt.rcParams.update({'text.color': 'green',
                      'axes.labelcolor': 'green',
                      'axes.edgecolor': 'green',
                      'axes.facecolor':  'none' })
-plt.scatter(x, y, c = 'red') # data
+plt.scatter(x, y, c = 'red', s = 10) # data
 plt.plot(xt, yt, c = 'gray', linestyle = 'dashed') # pure model
-plt.plot(x, st(x), c = 'orange', linewidth = 2) # clean spline
-plt.plot(xt, s(xt), c = 'blue', linewidth = 1) # noisy spline
+plt.plot(x, st(x), c = 'orange', linewidth = 2, alpha = 0.5) # clean spline
+plt.plot(xt, s(xt), c = 'blue', linewidth = 1, alpha = 0.5) # noisy spline
 plt.savefig('spline.png', transparent = True)

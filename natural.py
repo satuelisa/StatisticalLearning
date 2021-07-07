@@ -1,7 +1,10 @@
 from scipy.interpolate import CubicSpline
+from matplotlib.pyplot import figure
 from numpy.random import normal
 import matplotlib.pyplot as plt
 import numpy as np
+
+figure(figsize = (6, 4), dpi = 100)
 
 xt = np.arange(2, 4, 0.01) # true x coordinates
 n = len(xt)
@@ -18,6 +21,6 @@ plt.rcParams.update({'text.color': 'green',
                      'axes.edgecolor': 'green',
                      'axes.facecolor':  'none' })
 plt.scatter(x, y, c = 'gray', s = 10) # data
-plt.plot(xt, s(xt), linestyle = 'dashed', c = 'red') # regular spline (defaults to 'not-a-knot')
-plt.plot(xt, ns(xt), c = 'orange') # natural spline
+plt.plot(xt, s(xt), linestyle = 'dashed', c = 'red', alpha = 0.5) # regular spline (defaults to 'not-a-knot')
+plt.plot(xt, ns(xt), c = 'orange', alpha = 0.5) # natural spline
 plt.savefig('natural.png', transparent = True)

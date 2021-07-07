@@ -5,7 +5,7 @@ from matplotlib.pyplot import figure
 from numpy.random import normal, uniform
 from sklearn.linear_model import LinearRegression
 
-figure(figsize = (20, 4), dpi = 100)
+figure(figsize = (10, 2), dpi = 100)
 
 np.seterr(all='raise') 
 np.set_printoptions(precision = 2, suppress = True)
