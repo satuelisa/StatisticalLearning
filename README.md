@@ -31,10 +31,12 @@ experience and more pain on my part.
   * [Homework 4](#homework-4)
 + [Chapter 5: Basis expansions](#basis-expansions)
   * [Homework 5](#homework-5)
-+ [Chapter 6: Kernel smoothing](#kernel-smoothing)
++ [Chapter 6: Smoothing](#smoothing)
   * [Homework 6](#homework-6)
-+ [Chapter 7: Model assessment](#model-assessment)
++ [Chapter 7: Assessment](#assessment)
   * [Homework 7](#homework-7)
++ [Chapter 8: Inference](#inference)
+  * [Homework 8](#homework-8)
 
 ## Introduction
 
@@ -133,7 +135,7 @@ X = np.array([[1, 1, 1],
 assert n == np.shape(X)[0] # features as rows                                                         
 p = np.shape(X)[1] # inputs as columns                                                                
 
-# let assume the model is 3 x1 - 2 x2 + 4 x3 - 5 with small gaussian noise                            
+# let assume the model is 3 x1 - 2 x2 + 4 x3 - 5 with small Gaussian noise                            
 def gen(x): # generate integer labels from an arbitrary model                                         
     label = 5 * x[0] + 3 * x[1] - 2 * x[2] + 4 * x[3] \
                   + normal(loc = 0, scale = 0.2, size = 1)
@@ -157,14 +159,17 @@ for r in range(10): # replicas
     wr = np.array(uniform(low = -6, high = 6, size = n)).T
     print(f'{rss(X, y, wr)} for {wr}') # the smaller the better   
 ``` 
-and this is very similar to what the perceptron does (cf. the last
-homework of the simulation course, if you took that one already). This
-code (which is not a lot) is available in the
+
+and this is very similar to what the perceptron does (cf. the [last
+homework](https://elisa.dyndns-web.com/teaching/comp/par/p12.html) of
+the [simulation
+course](https://elisa.dyndns-web.com/teaching/comp/par/), if you took
+that one already). This code (which is not a lot) is available in the
 file
-[`linear.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/linear.py) and
-I really recommend sticking to the NumPy routines for creating vectors
-and matrices as well as multiplying them. Remember to pay close
-attention to the dimensions.
+[`linear.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/linear.py)
+and I really recommend sticking to the NumPy routines for creating
+vectors and matrices as well as multiplying them. Remember to pay
+close attention to the dimensions.
 
 ### Nearest neighbors
 
@@ -173,8 +178,9 @@ some (metric) space in which we can compute a distance from one input
 to another. Then, when we encounter a non-labelled input `x`, we
 simply take the `k` nearest labelled inputs and average over their
 values of `y` to obtain a `yp` for our `x`. When using just one
-neighbor, this effectively reduces to Voronoi cells (cf. the fourth
-homework of simulation).
+neighbor, this effectively reduces to Voronoi cells (cf. the [fourth
+homework of
+simulation](https://elisa.dyndns-web.com/teaching/comp/par/p4.html)).
 
 In terms of code, let's generate random data again (the book has a
 two-dimensional example):
@@ -249,11 +255,13 @@ Things to consider when applying KNN are:
 Read Sections 2.3 and 2.4 to improve your understanding of _why_ and
 _how_ these methods are expected to be useful, as well as Section 2.5
 to understand why they tend to fall apart when the number of features
-is very high (this is similar to what happens in the first simulation
-homework for the high-dimensional Brownian motion that no longer
-returns to the origin and the eleventh simulation homework with Pareto
-fronts where a high number of objective functions renders the
-filtering power of non-dominance effectively null and void). The
+is very high (this is similar to what happens in the [first simulation
+homework](https://elisa.dyndns-web.com/teaching/comp/par/p1.html) for
+the high-dimensional Brownian motion that no longer returns to the
+origin and the [eleventh simulation
+homework](https://elisa.dyndns-web.com/teaching/comp/par/p11.html)
+with Pareto fronts where a high number of objective functions renders
+the filtering power of non-dominance effectively null and void). The
 remainder of the chapter introduces numerous theoretical concepts that
 we are likely to stumble upon later on, so please give them at least a
 cursorial look at this point so you know that they are there.
@@ -370,7 +378,7 @@ np.set_printoptions(precision = 2, suppress = True)
 
 high = 0.95 # correlation threshold
 alpha = 0.01 # significance level for the p value
-z1a = norm.ppf(1 - alpha) # gaussian percentile 
+z1a = norm.ppf(1 - alpha) # Gaussian percentile 
 
 # more inputs this time so that n - 1 > p 
 n = 100
@@ -744,7 +752,7 @@ a [library for that](https://pywavelets.readthedocs.io/en/latest/).
 Fit splines into single features in your project data. Explore options
 to obtain the best fit.
 
-## Kernel smoothing
+## Smoothing
 
 Instead of fitting one model to all of the data, we can fit simple,
 local models for each point we are interested in; the book calls these
@@ -846,7 +854,7 @@ You guessed it. That's the homework. Build some local regression model
 for your data and adjust the parameters. Remember to read all of
 Chapter 6 first to get as many ideas as possible. 
 
-## Model assessment
+## Assessment
 
 Suppose we have tons of data. We first separate our available data, at
 random, into three non-overlapping sets:
@@ -1001,9 +1009,98 @@ You guessed it again, you clever devil: apply both cross-validation
 and bootstrap to your project data to study how variable your results
 are when you switch the test set around.
 
-## Chapter 8
+## Inference
+
+The methods applied thus far concentrate on minimizing an error
+measure such as the sum of squares or cross entropy; now, instead, we
+maximize the _likelihood_ in a Bayesian sense.
+
+First, consider doing a bootstrap but by adding Gaussian noise to the
+predictions and then use the minimum and maximum values over the
+replicas as upper and lower limits of confidence bands to the
+estimate. Let's make a wide example plot
+
+```python
+from matplotlib.pyplot import figure
+figure(figsize = (20, 4), dpi = 100)
+```
+
+so that we can draw for each input the bounds we get from a bunch of
+bootstrap replicas using their minimums and maximums:
+
+```python
+low = [float('inf')] * n
+high = [-float('inf')] * n
+pos = [i for i in range(n)]
+for r in range(b): 
+    Xb = np.zeros((n, p))
+    yb = np.zeros(n)
+    i = 0
+    for s in choices(pos, k = n): 
+        Xb[i, :] = X[s, :]
+        yb[i] = y[s]
+    model = LinearRegression().fit(Xb, yb) 
+    repl = model.predict(X) # predict 
+    for i in range(n):
+        prediction = repl[i]
+        low[i] = min(low[i], prediction)
+        high[i] = max(high[i], prediction)
+
+plt.xlabel('Input index')
+plt.ylabel('Predictions')
+plt.vlines(pos, low, high, zorder = 1) # behind
+plt.scatter(pos, low, c = 'red', zorder = 2) # front
+plt.scatter(pos, high, c = 'blue', zorder = 2) # front
+plt.show()
+```
+
+The whole thing is in
+[`bands.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/bands.py)
+and the resulting figure shows ![these errorbar
+thingies](https://github.com/satuelisa/StatisticalLearning/blob/main/bands.png)
+
+With an infinite number of replicas, this would result in the same
+bands as a least-squares approach. Averaging over the predictions is
+called _bagging_ and is discussed in Section 8.7 with cool
+examples. If instead of averaging, we opt for a best-fit approach,
+then it's called _bumping_ and Section 8.9 is the place to be.
+
+Suppose that `g` is a probability density function for the
+observations, parametrized in some way. For example, a Gaussian
+distribution would have two parameters: the mean and the variance.
+
+A _likelihood function_ is the _product_ of the values of `g` under
+those parameters for all of our input vectors. Take the logarithm of
+that so you can deal with a sum instead of a product, and you have the
+corresponding _log-likelihood_ function.
+
+Now, the _score_ of a certain parameter-data combo is the value of its
+log-likelihood. We want to make model choices that maximize this
+score.
+
+In a Bayesian spirit, one can compute the conditional (posterior)
+distribution for those parameter values given the input data which we
+can then combine with the conditional probabilities of new data given
+the parameters to compute a _predictive distribution_. One would like
+to sample this posterior distribution, but in practice it tends to be
+such a mess that you will want to go MCMC on this (see the [fifth
+homework](https://elisa.dyndns-web.com/teaching/comp/par/p5.html) of
+the [simulation
+course](https://elisa.dyndns-web.com/teaching/comp/par/) that I keep
+mentioning and read Section 8.6 for more info on how that
+works). Averaging over Bayesian models is discussed in Section 8.8.
+
+A careful examination of Section 8.4 is a wonderful way to develop a
+headache over these concepts. Section 8.5, however, explains how the
+_expectation-maximimization_ (EM) works. This is delightfully
+complemented by the discussion of how to do it in Python given by
+[Siwei
+Causevic](https://towardsdatascience.com/implement-expectation-maximization-em-algorithm-in-python-from-scratch-f1278d1b9137).
 
 ### Homework 8
+
+Yeah, do EM with your data following the from-scratch steps of
+[Causevic](https://towardsdatascience.com/implement-expectation-maximization-em-algorithm-in-python-from-scratch-f1278d1b9137).
 
 ## MARS
 
