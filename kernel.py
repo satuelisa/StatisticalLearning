@@ -40,8 +40,11 @@ for point in xq:
     else: # do NOT divide by zero
         yq.append(None) # no value obtained for this point (omit in drawing)
 
+plt.rcParams.update({'text.color': 'green',
+                     'axes.labelcolor': 'green',
+                     'axes.facecolor':  'none' })
 plt.plot(xq, yq, c = 'orange', linewidth = 2, linestyle = 'dashed') # model
 plt.scatter(xq, yq, c = 'red', s = 15) # query points
 plt.scatter(x, y, c = 'gray', s = 15) # data
-plt.savefig('kernel.png')
+plt.savefig('kernel.png', transparent = True)
 

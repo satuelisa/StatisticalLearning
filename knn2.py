@@ -28,8 +28,11 @@ for point in xq: # local models
             ny[i] = y[known]
     yq.append(sum(ny) / k)
 
+plt.rcParams.update({'text.color': 'green',
+                     'axes.labelcolor': 'green',
+                     'axes.facecolor':  'none' })
 plt.plot(xq, yq, c = 'orange', linewidth = 2, linestyle = 'dashed') # model
 plt.scatter(xq, yq, c = 'red', s = 15) # query points
 plt.scatter(x, y, c = 'gray', s = 15) # data
-plt.savefig('knn2.png')
+plt.savefig('knn2.png', transparent = True)
 

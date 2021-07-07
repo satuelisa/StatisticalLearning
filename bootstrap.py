@@ -1,6 +1,5 @@
 import numpy as np
 from random import choices # sample with replacement
-from numpy.linalg import qr, inv
 from numpy.random import normal, uniform
 from sklearn.linear_model import LinearRegression
 
