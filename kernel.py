@@ -43,6 +43,5 @@ for point in xq:
 plt.plot(xq, yq, c = 'orange', linewidth = 2, linestyle = 'dashed') # model
 plt.scatter(xq, yq, c = 'red', s = 15) # query points
 plt.scatter(x, y, c = 'gray', s = 15) # data
-
-plt.show()
+plt.savefig('kernel.png')
 

@@ -16,4 +16,4 @@ plt.scatter(x, y, c = 'red') # data
 plt.plot(xt, yt, c = 'blue', linestyle = 'dashed') # pure model
 plt.plot(x, st(x), c = 'green') # clean spline
 plt.plot(xt, s(xt), c = 'black') # noisy spline
-plt.show()
+plt.savefig('spline.png')

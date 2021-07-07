@@ -14,4 +14,4 @@ ns = CubicSpline(x, y, bc_type = 'natural') # fit a NATURAL cubic spline
 plt.scatter(x, y, c = 'gray', s = 10) # data
 plt.plot(xt, s(xt), linestyle = 'dashed', c = 'red') # regular spline (defaults to 'not-a-knot')
 plt.plot(xt, ns(xt), c = 'black') # natural spline
-plt.show()
+plt.savefig('natural.png')

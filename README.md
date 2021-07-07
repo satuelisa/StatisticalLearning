@@ -712,7 +712,11 @@ the step size (the third parameter of `np.arange(-7, 7, 0.05)`) to see
 how the spline behaves. Also mess with the function itself. We use
 `from scipy.interpolate import CubicSpline` to create the spline.
 Note that `CubicSpline` wants an ordered `x`, so we  **have to** sort
-after we add the noise. The figure that opens shows the data with red
+after we add the noise. 
+
+![The resulting splines](https://github.com/satuelisa/StatisticalLearning/blob/main/spline.png)
+
+The figure shows the data with red
 dots, a green dashed line for the function we used, and two splines:
 one fitted to the "model" and another one fitted to the noisy version
 of the coordinates.
@@ -739,6 +743,8 @@ plt.plot(xt, ns(xt), c = 'black') # natural spline now drawn in BLACK
 If there is a difference, it appears at the edges of the plot. Rerun
 until you've seen it at both ends (the random noise affects the spline
 computations so the outcome differs at each execution).
+
+![Natural splines](https://github.com/satuelisa/StatisticalLearning/blob/main/natural.png)
 
 There are many fine details to applying this, so it is important to
 read all of Chapter 5. 
@@ -801,6 +807,8 @@ for point in xq: # local models
     yq.append(sum(ny) / k)
 ```
 
+![KNN](https://github.com/satuelisa/StatisticalLearning/blob/main/knn2.png)
+
 The curve resulting by connecting the query point estimates is, of
 course, generally discontinuous, as expected. Throwing in some more
 math, we can patch the existing math for a smoother result. First we
@@ -839,6 +847,8 @@ for point in xq:
     else: # do NOT divide by zero
         yq.append(None) # no value obtained for this point (omit in drawing)
 ```
+
+![Smoothing](https://github.com/satuelisa/StatisticalLearning/blob/main/kernel.png)
 
 Of course we could use another `dt` like that of Eq. (6.7) or a
 different kernel. Now, applying this same idea to linear or even
@@ -1051,7 +1061,6 @@ plt.ylabel('Predictions')
 plt.vlines(pos, low, high, zorder = 1) # behind
 plt.scatter(pos, low, c = 'red', zorder = 2) # front
 plt.scatter(pos, high, c = 'blue', zorder = 2) # front
-plt.show()
 ```
 
 The whole thing is in
