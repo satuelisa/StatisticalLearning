@@ -37,15 +37,15 @@ experience and more pain on my part.
   * [Homework 7](#homework-7)
 + [Chapter 8: Inference](#inference)
   * [Homework 8](#homework-8)
-- [Chapter 9: Additive models and trees](#additive-models-and-trees)
++ [Chapter 9: Additive models and trees](#additive-models-and-trees)
   * [Homework 9](#homework-9)
-- [Chapter 10: Boosting](#boosting)
++ [Chapter 10: Boosting](#boosting)
   * [Homework 10](#homework-10)
-- [Chapter 11](#chapter-11)
++ [Chapter 11](#chapter-11)
   * [Homework 10](#homework-11)
-- [Chapter 12: Kernels](#kernels)
++ [Chapter 12: Kernels](#kernels)
   * [Homework 10](#homework-12)
-- [Chapter 13](#chapter-13)
++ [Chapter 13](#chapter-13)
   * [Homework 13](#homework-13)
 
 ## Introduction
@@ -1167,7 +1167,7 @@ available as a
 [`pip`package](https://github.com/Project-Platypus/PRIM), whereas
 _multivariate adaptive regression splines_ (MARS) discussed in Section
 9.4 using `scikit-learn`is explained in [Jason Brownee's blog
-post(https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/).
+post](https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/).
 
 If you dislike the idea of splitting the feature space qinto
 non-overlapping subregions, _hierarchical mixtures of experts_ (HME)
