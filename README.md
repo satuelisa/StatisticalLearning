@@ -37,6 +37,16 @@ experience and more pain on my part.
   * [Homework 7](#homework-7)
 + [Chapter 8: Inference](#inference)
   * [Homework 8](#homework-8)
+- [Chapter 9: Additive models and trees](#additive-models-and-trees)
+  * [Homework 9](#homework-9)
+- [Chapter 10: Boosting](#boosting)
+  * [Homework 10](#homework-10)
+- [Chapter 11](#chapter-11)
+  * [Homework 10](#homework-11)
+- [Chapter 12: Kernels](#kernels)
+  * [Homework 10](#homework-12)
+- [Chapter 13](#chapter-13)
+  * [Homework 13](#homework-13)
 
 ## Introduction
 
@@ -723,9 +733,9 @@ of the coordinates.
 
 ```python
 plt.scatter(x, y, c = 'red') # data
-plt.plot(xt, yt, c = 'blue', linestyle = 'dashed') # pure model
-plt.plot(x, s(x), c = 'green') # clean spline
-plt.plot(xt, s(xt), c = 'black') # noisy spline
+plt.plot(xt, yt, c = 'gray, linestyle = 'dashed') # pure model
+plt.plot(x, s(x), c = 'orange) # clean spline
+plt.plot(xt, s(xt), c = 'blue) # noisy spline
 ```
 
 Undesirable behaviour at boundaries can be somewhat tamed by using
@@ -737,7 +747,7 @@ ns = CubicSpline(x, y, bc_type = 'natural') # fit a NATURAL cubic spline
 
 plt.scatter(x, y, c = 'gray', s = 10) # data now in GRAY with small dots
 plt.plot(xt, s(xt), linestyle = 'dashed', c = 'red') # the default one in RED
-plt.plot(xt, ns(xt), c = 'black') # natural spline now drawn in BLACK
+plt.plot(xt, ns(xt), c = 'orange') # natural spline now in ORANGE
 ```
 
 If there is a difference, it appears at the edges of the plot. Rerun
@@ -1022,7 +1032,10 @@ are when you switch the test set around.
 ## Inference
 
 The methods applied thus far concentrate on minimizing an error
-measure such as the sum of squares or cross entropy; now, instead, we
+measure such as the sum of squares or _cross entropy_ (check out the
+[tutorial by Jason
+Brownlee](https://machinelearningmastery.com/cross-entropy-for-machine-learning/)
+if the word "entropy" still makes you anxious); now, instead, we
 maximize the _likelihood_ in a Bayesian sense.
 
 First, consider doing a bootstrap but by adding Gaussian noise to the
@@ -1065,7 +1078,9 @@ plt.scatter(pos, high, c = 'blue', zorder = 2) # front
 
 The whole thing is in
 [`bands.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/bands.py)
-and the resulting figure shows ![these errorbar
+and the resulting figure shows errorbars-like things.
+
+![Errorbar
 thingies](https://github.com/satuelisa/StatisticalLearning/blob/main/bands.png)
 
 With an infinite number of replicas, this would result in the same
@@ -1111,18 +1126,73 @@ Causevic](https://towardsdatascience.com/implement-expectation-maximization-em-a
 Yeah, do EM with your data following the from-scratch steps of
 [Causevic](https://towardsdatascience.com/implement-expectation-maximization-em-algorithm-in-python-from-scratch-f1278d1b9137).
 
-## MARS
+## Additive models and trees
+
+
+Still within the realm of supervised learning, we now look at
+different options for structuring a regression function. 
+
+In an _additive_ model, we assume that the expectation of `Y` given
+`X`is a linear combination of individual functions `f(x)` over the
+features that form `X` (again assuming a unit vector there for the
+constant term). The relationship between the mean of `Y` conditioned
+on `X` to that sum of the `f(x)`terms is given by a **link
+function**(options include _logit_, _probit_, identity or just a
+logarithm). The task is to come with the those functions `f(x)` for
+each feature; they do not need to be all linear or nonlinear
+(especially mixing quantitative and qualitative features often
+requires diverse `f`s). What is optimized is a (possibly weighted) sum
+of squares of the errors (with tons of tunable parameters). Iterative
+methods that keep adjusting the functions until they stabilize in a
+sense are typical (cf. _backfitting_ in Algorithm 9.1 of the book).
+
+Methods that use _trees_ work by partitioning the feature space into
+(non-overlapping) hypercubes and fitting a separate model to each
+cube. Such partitioning is often done recursively. The magical part
+is, naturally, choosing the partition thresholds for the features,
+usually by optimizing some quantity that measures "distance" or
+"separation" between the two sides. This is very common for
+classification problems and the methods are (quite evidently) called
+_classification trees_. Potential performance measures include
+counting classification errors, computing the deviance
+(cross-entropy), as well as the **Gini index** (check out the tutorial
+by [Kimberly
+Fessel](http://kimberlyfessel.com/mathematics/applications/gini-use-cases/)
+to understand this in general and [Shagufta Tahsildar's blog
+post](https://blog.quantinsti.com/gini-index/) for the specific
+context of classification).
+
+The _patient rule induction method_ (PRIM) discussed in Section 9.3 is
+available as a
+[`pip`package](https://github.com/Project-Platypus/PRIM), whereas
+_multivariate adaptive regression splines_ (MARS) discussed in Section
+9.4 using `scikit-learn`is explained in [Jason Brownee's blog
+post(https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/).
+
+If you dislike the idea of splitting the feature space qinto
+non-overlapping subregions, _hierarchical mixtures of experts_ (HME)
+is a probabilistic variant of the tree-based approach (Section 9.5),
 
 ### Homework 9
 
-To do this with several features, look into MARS
-(https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/)
-using `scikit-learn`.
+Read through the spam example used throughout Chapter 9 and make an
+effort to replicate the steps for your own data. When something isn't
+quite applicable, discuss the reasons behind this. Be sure to read
+Sections 9.6 and 9.7 before getting started.
 
-## Chapter 10
+## Boosting 
+
+### Homework 10
 
 ## Chapter 11
 
+### Homework 11
+
 ## Kernels
 
+### Homework 12
+
 ## Chapter 13
+
+### Homework 13
+
