@@ -1205,7 +1205,7 @@ works. All of this can be, of course, tweaked in tons of ways, including
 - optimizing the loss function with gradient boosting (such as steepest descent)
 - _regularization_ to avoid overfitting; _shrinkage_ to keep the models small
 - bootstrapping or bagging to average stuff out (and reduce variance)
-- 
+ 
 ### Homework 10
 
 Replicate the steps of the California housing example of Section
