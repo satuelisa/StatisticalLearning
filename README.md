@@ -13,7 +13,7 @@ The data sets used in the examples are from
 the [book's website](https://www-stat.stanford.edu/ElemStatLearn).  I
 hope that there will be native LaTeX rendering in the markdown soon,
 so I could include equations (the present solutions of generating
-images are quite ugly in darfk mode). The book uses R in their example
+images are quite ugly in dark mode). The book uses R in their example
 code, so I am going to replant everything in Python for an enriched
 experience and more pain on my part.
 
@@ -183,10 +183,10 @@ close attention to the dimensions.
 
 ### Nearest neighbors
 
-This technique supposes that we have a set of pre-labelled inputs in
+This technique supposes that we have a set of pre-labeled inputs in
 some (metric) space in which we can compute a distance from one input
-to another. Then, when we encounter a non-labelled input `x`, we
-simply take the `k` nearest labelled inputs and average over their
+to another. Then, when we encounter a non-labeled input `x`, we
+simply take the `k` nearest labeled inputs and average over their
 values of `y` to obtain a `yp` for our `x`. When using just one
 neighbor, this effectively reduces to Voronoi cells (cf. the [fourth
 homework of
@@ -204,7 +204,7 @@ n = 5 # number of features
 low = 1
 high = 3
 
-# generate 'labelled' data at random
+# generate 'labeled' data at random
 N = 100 # amount of known data points
 # a list of pairs (x, y)
 known = []
@@ -221,7 +221,7 @@ def dist(x1, x2): # using euclidean distance for simplicity
 
 Now we can find for a given `x` the `k` known data points nearest to
 it and store the corresponding labels `y`; we have to consider all of
-the labelled data by turn and remember which `k` were the closest
+the labeled data by turn and remember which `k` were the closest
 ones, which I will do in a simple for loop for clarity instead of
 attempting to iterate over a matrix.
 
@@ -274,7 +274,7 @@ with Pareto fronts where a high number of objective functions renders
 the filtering power of non-dominance effectively null and void). The
 remainder of the chapter introduces numerous theoretical concepts that
 we are likely to stumble upon later on, so please give them at least a
-cursorial look at this point so you know that they are there.
+cursory look at this point so you know that they are there.
 
 ### Homework 2
 
@@ -291,7 +291,7 @@ _transformations_ (roots, logarithms, powers) to the quantitative
 ones, whereas the qualitative ones can be numerically coded (varying
 the ordering), and we could create _interactions_ by introducing
 auxiliary functions to create a "combination feature" that takes as
-inputs two or more of the original features. As noted befare, we
+inputs two or more of the original features. As noted before, we
 usually aim to choose the weights so as to minimize the residual sum
 of squares (RSS). Such minimization, theoretically, is achieved by
 setting its first derivative to zero and solving for the weights.
@@ -366,10 +366,10 @@ Note that this will not work if any of the inputs are perfectly
 correlated (as it would result in a singular matrix for
 `np.matmul(X.T, T)`, so some pre-processing may be necessary. If `p`
 is much larger than `n`, problems may also arise and some
-dimensinality-reduction in the feature space could come in handy.  All
+dimensionality-reduction in the feature space could come in handy.  All
 of the above takes place
 in
-[`regression.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/regression.py).
+[`regression.NY`](https://github.com/satuelisa/StatisticalLearning/blob/main/regression.py).
 
 Let's make another version that actually examines the correlations and
 attempts to assess the statistical significance of the model, whenever
@@ -457,7 +457,7 @@ Once all of this plays out, we can try to run the math:
 
 Usually, one assumes that the deviations between the predicted `yp`
 and the expected `y` are normally distributed. If so, the estimated
-weights `w` are normally distibuted around the true weights and their
+weights `w` are normally distributed around the true weights and their
 variance is from a chi-squared distribution (`n - p - 1` DoF),
 allowing for the calculation of confidence intervals.  To
 statistically check if a specific weight in `w` is zero (that is, the
@@ -542,7 +542,7 @@ methods, check out the thorough examples by
 ### Homework 3
 
 Repeat the steps of the prostate cancer example in Section 3.2.1 using
-Python, first as a univariate problem using the book's data set and
+Python, first as a uni-variate problem using the book's data set and
 then as a multi-variate problem with data from your own
 project. Calculate also the p-values and the confidence intervals for
 the model's coefficients for the uni-variate version. Experiment,
@@ -561,7 +561,7 @@ then obtain posterior probabilities. The whole thing is at
 
 First we make a model with integer labels 1 and 2.
 ```python
-import numpy as np  
+import numpy as np
 from math import exp
 from numpy.linalg import qr, inv 
 from numpy.random import normal
@@ -593,7 +593,7 @@ Then we make indicator vectors (true versus false) for each of the two classes:
 y = np.array([(1.0 * (intended == 1)), (1.0 * (intended == 2))]).T
 ```
 
-With those, we recycle the multiregression math with the QR decomposition:
+With those, we recycle the multi-regression math with the QR decomposition:
 
 ```python
 Q, R = qr(X)
@@ -632,10 +632,9 @@ for c in [1, 2]: # for both classes
         print(f'{x} should be {yd}: this {pThis:.2f} vs. other {pOther:.2f} ->', 'right' if ok else 'wrong')
 ```
 
-Most of the input are correctly labelelled regardless of which class
-is used to compute the posterior probabilities. As the book points
-out, in practice, class boundaries have no particular reason to be
-linear. 
+Most of the input are correctly labeled regardless of which class is
+used to compute the posterior probabilities. As the book points out,
+in practice, class boundaries have no particular reason to be linear.
 
 We can also predict without explicitly computing the weights as in Equation (4.3) of the book
 [`indmat.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/indmat.py), using the same `X`
@@ -662,14 +661,14 @@ same, _quadratic discriminant functions_ arise. An option to LDA/QDA
 is _regularized discriminant analysis_ (RDA). Subspace projections may
 also come in handy.
 
-**Logistic regression** for classes `1, 2, ..., k` refers to modelling
+**Logistic regression** for classes `1, 2, ..., k` refers to modeling
 logit transformations (logarithm of the posterior probability of a
 specific class `i` normalized by the posterior probability of the last
 class `k`) with linear functions in the input space, using a linear
 function `ci + bi.T x` where `ci` is the constant term and `bi` the
 weight vector for class `i`, with such an equation for each `i < k`
 and then iteratively solving for the values of the `ci` and the
-vectors `bi`. This may or may not converge and reles on an initial
+vectors `bi`. This may or may not converge and relies on an initial
 guess for the weights. A regularized version exists for this as well.
 
 Please read all of Chapter 4 carefully. Also perceptrons (already
@@ -696,7 +695,7 @@ features sky-high.
 The transformations could be specific functions (attempted with a
 Tukey ladder, for example) such as logarithms or powers, but _basis
 expansions_ is a more flexible way to get this done. This chapter
-deals with using piecewise polynomials and splines as also touches the
+deals with using piece-wise polynomials and splines as also touches the
 use of wavelets.
 
 It is common to doing this assuming **additivity**: each _model_
@@ -738,7 +737,7 @@ plt.plot(x, s(x), c = 'orange) # clean spline
 plt.plot(xt, s(xt), c = 'blue) # noisy spline
 ```
 
-Undesirable behaviour at boundaries can be somewhat tamed by using
+Undesirable behavior at boundaries can be somewhat tamed by using
 _natural_ splines 
 ([`natural.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/natural.py)):
 ```python
@@ -759,7 +758,7 @@ computations so the outcome differs at each execution).
 There are many fine details to applying this, so it is important to
 read all of Chapter 5. 
 
-An alterative family of basis functions are _wavelets_ that are
+An alternative family of basis functions are _wavelets_ that are
 orthonormal. There is
 a [library for that](https://pywavelets.readthedocs.io/en/latest/).
 
@@ -772,10 +771,10 @@ to obtain the best fit.
 
 Instead of fitting one model to all of the data, we can fit simple,
 local models for each point we are interested in; the book calls these
-_query points_. The way "locality" is defined is by assigining a
+_query points_. The way "locality" is defined is by assigning a
 function that sets a weight for each data point based on its distance
 from the query point. These weight-assignment functions are called
-**kernels** and are usually parametrized in a way that controls how
+**kernels** and are usually parameterized in a way that controls how
 wide the neighborhood will be. Kernels are the topic of Chapter 12.
 
 This is like the simple thing we did for the nearest-neighbor
@@ -892,7 +891,7 @@ data repeatedly (like cross-validation and bootstrap).
 
 So, if we have tons of potential models with various different subsets
 and transformations of the features, using different techniques, how
-do we quentify how good these models are and how would be go about
+do we quantify how good these models are and how would be go about
 choosing one in particular to actually use for whatever application we
 have in mind.
 
@@ -911,7 +910,7 @@ version such as _deviance_ as in Equation (7,6).
 In terms of such a function `L`, we can define _generalization error_
 (a.k.a. _test error_) as the expected value of `L`, conditioned on a
 (specific, fixed) test set `T`, where the inputs of `T` are _not_ the
-ones we included in the traning set `X` that was used to build the
+ones we included in the training set `X` that was used to build the
 model in the first place.  
 
 The expected value of this expectation over possible test sets is the
@@ -929,7 +928,7 @@ unseen_ data. The difference of errors when measured
 (1) on actual validation or testing data (larger error) and (2) on the
 training data itself (smaller error) is called the _optimism_ of the
 model. Analytically, optimism increases linearly with the number of
-features we use (raw or transformed). If we estimate optism
+features we use (raw or transformed). If we estimate optimism
 (analytically) and then add it to the training error, we get an
 estimate for the actual prediction error. This is what is discussed in
 Section 7.5 of the book.
@@ -937,7 +936,7 @@ Section 7.5 of the book.
 We assume the error to be a a sum of three factors: an _irreducible
 error_ plus _bias_ (squared) plus _variance_, the first of which is
 the variability present in the phenomenon that is being modeled, the
-second measures how far the estimated mean is from the true mean, amd
+second measures how far the estimated mean is from the true mean, and
 the third measures how the estimates deviate from their mean. Complex
 models tend to achieve a lower bias (a more precise mean) but with the
 cost of a higher variance. Section 7.6 discusses how to determine the
@@ -954,13 +953,13 @@ increase in the other.
 
 A very popular way to go about prediction error estimation is called
 **cross-validation** that estimates, in a direct manner, the expected
-errorover independent test samples. First, take your data and split it
+error over independent test samples. First, take your data and split it
 into `c` non-overlapping subsets. Then, iterate `c` times as follows:
 set the `c`th subset aside for validation and use the other `c - 1`
 subsets, combined, as training data. Average over the loss functions
 to obtain an estimate for the prediction error. Yes, you should try
 different values of `c` to find out which one works with any
-particular data-model combination. It is imporant to carry out the
+particular data-model combination. It is important to carry out the
 entire process `c` times with the resulting test sets, instead of
 building once and then attempting to "only validate" multiple times
 (read Section 7.10 to understand why it is bad to limit it to just
@@ -1090,7 +1089,7 @@ examples. If instead of averaging, we opt for a best-fit approach,
 then it's called _bumping_ and Section 8.9 is the place to be.
 
 Suppose that `g` is a probability density function for the
-observations, parametrized in some way. For example, a Gaussian
+observations, parameterized in some way. For example, a Gaussian
 distribution would have two parameters: the mean and the variance.
 
 A _likelihood function_ is the _product_ of the values of `g` under
@@ -1116,7 +1115,7 @@ works). Averaging over Bayesian models is discussed in Section 8.8.
 
 A careful examination of Section 8.4 is a wonderful way to develop a
 headache over these concepts. Section 8.5, however, explains how the
-_expectation-maximimization_ (EM) works. This is delightfully
+_expectation-maximization_ (EM) works. This is delightfully
 complemented by the discussion of how to do it in Python given by
 [Siwei
 Causevic](https://towardsdatascience.com/implement-expectation-maximization-em-algorithm-in-python-from-scratch-f1278d1b9137).
@@ -1169,8 +1168,8 @@ _multivariate adaptive regression splines_ (MARS) discussed in Section
 9.4 using `scikit-learn`is explained in [Jason Brownee's blog
 post](https://machinelearningmastery.com/multivariate-adaptive-regression-splines-mars-in-python/).
 
-If you dislike the idea of splitting the feature space qinto
-non-overlapping subregions, _hierarchical mixtures of experts_ (HME)
+If you dislike the idea of splitting the feature space into
+non-overlapping sub-regions, _hierarchical mixtures of experts_ (HME)
 is a probabilistic variant of the tree-based approach (Section 9.5),
 
 ### Homework 9
@@ -1182,7 +1181,38 @@ Sections 9.6 and 9.7 before getting started.
 
 ## Boosting 
 
+Much like bagging, **boosting** refers to making use of multiple weak
+models (with classification errors only a wee bit better than random
+chance, for example) in forming a decently-performing one.
+
+So, produce a total `k` weak classifiers, each with a modified input
+set (created for example by weighted sampling, where each iteration
+assigns more weight to those samples that the preceding ones
+mis-labeled), and then combine these (possibly again with weights) to
+produce the final classification. An example of this approach is
+[AdaBoost](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostClassifier.html)
+and the idea also works for
+[regression](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html).
+The thing to be optimized are the weights of the component models upon
+computing the combined model. For AdaBoost, the component weights will
+be a logarithm of the success/error ratio (see Algorithm 10.1 in the
+book). The tenth chapter, overall, discusses how and why this
+works. All of this can be, of course, tweaked in tons of ways, including 
+
+- gradually expanding the set of possible _basis functions_ over the iterations
+- using different _loss functions_, such as exponential ones
+- using this on _trees_ instead of 'flat' classifiers
+- optimizing the loss function with gradient boosting (such as steepest descent)
+- _regularization_ to avoid overfitting; _shrinkage_ to keep the models small
+- bootstrapping or bagging to average stuff out (and reduce variance)
+- 
 ### Homework 10
+
+Replicate the steps of the California housing example of Section
+10.14.1 (with some [library
+implementation](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html))
+unless you really want to go all-in with this) to explore potential
+dependencies and interactions in the features of your data.
 
 ## Chapter 11
 
@@ -1196,3 +1226,10 @@ Sections 9.6 and 9.7 before getting started.
 
 ### Homework 13
 
+## CHapter 14
+
+### Homework 14
+
+## Variance reduction
+
+### Homework 15
