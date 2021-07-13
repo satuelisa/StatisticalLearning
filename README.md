@@ -41,7 +41,7 @@ experience and more pain on my part.
   * [Homework 9](#homework-9)
 + [Chapter 10: Boosting](#boosting)
   * [Homework 10](#homework-10)
-+ [Chapter 11](#chapter-11)
++ [Chapter 11: Neural networks](#neural-networks)
   * [Homework 10](#homework-11)
 + [Chapter 12: Kernels](#kernels)
   * [Homework 10](#homework-12)
@@ -1214,9 +1214,57 @@ implementation](https://scikit-learn.org/stable/modules/generated/sklearn.ensemb
 unless you really want to go all-in with this) to explore potential
 dependencies and interactions in the features of your data.
 
-## Chapter 11
+## Neural networks
+
+General idea: use the original features to create linear combinations
+of them (I will refer to these building blocks as _neurons_) and then
+build a model as a non-linear function of these.
+
+**Projection pursuit regression** (PPR): `f(X) =
+sum([g[k](np.matmul(w[k].T, X) for k in neurons])`, meaning that for
+each neuron `k` we compute a scalar multiplying the inputs from the
+left with the transposed _weights_ of that neuron and use a specific
+_ridge function_ `g` for each neuron, then summing over the resulting
+values. Both the weights `w` and the functions `g` need to be
+estimated with an optimization procedure of sorts. Note that
+flexibility in the choice of the `g` allows representing for example
+multiplicative features (see Section 11.2 of the book). The larger the
+value of `k`, the more complex the model, of course. In economics, the
+case `k = 1` is called the _single index model_.
+
+In a neural network, each neuron of the first (hidden)
+layer_activates_ as a function of `np.matmul(w.T, X)` (for example a
+sigmoidal function), yielding an intermediate input. These `k`
+intermediate inputs are fed into an output layer, the neurons of which
+produce their own linear combinations of the intermediate inputs,
+which are then fed into a function that gives the output of the
+network. See Figure 11.2 of the book for an illustration of this
+structure. It is common to include the constant unit feature to
+represent _bias_. The weights of the neurons are what needs to be
+estimated to minimize error (analytically or just iteratively; SSQ for
+regression, cross-entropy for classification), avoiding over-fitting
+as it ruins generalization to unseen data. **Back-propagation** refers
+to computing predictions using current weights, then calculating the
+errors, and using these errors to make adjustments to the weights that
+gave rise to them. This is pleasant to parallelize. The adjustments
+can be either made after each individual input has been processed or
+in batch mode.
+
+Frequent issues:
+
++ good initial weights (random, small)
++ over fitting (use a tuning parameter)
++ normalization of inputs
++ choosing `k`for the hidden layer 
++ deciding whether to also have `k` outputs or fewer
++ deciding whether multiple hidden layers would help
++ local minima
 
 ### Homework 11
+
+Go over the steps of the ZIP code examples in Chapter 11 and replicate
+as much as you can with your own project data. Don't forget to read
+the whole chapter before you start.
 
 ## Kernels
 
@@ -1226,7 +1274,7 @@ dependencies and interactions in the features of your data.
 
 ### Homework 13
 
-## CHapter 14
+## Chapter 14
 
 ### Homework 14
 
