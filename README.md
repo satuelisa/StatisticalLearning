@@ -1295,10 +1295,17 @@ _slack variables_ which I will denote by `s[i]` and the book denotes
 by xi. 
 
 For maximizing `M` even with some of the data on the wrong size, we
-can restrict to `np.matmul(y[i], np.matmul(x[j].T, w[i]) + constant)
->= M - s[i]` which looks easy but results in a non-convex problem and
-that's inconvenient. So instead we opt to require `np.matmul(y[i],
-np.matmul(x[j].T, w[i]) + constant) >= M * (1 - s[i])` altering the
+can restrict to 
+
+`np.matmul(y[i], np.matmul(x[j].T, w[i]) + constant) >= M - s[i]`
+
+which looks easy but results in a non-convex problem and
+that's inconvenient. So instead we opt to require 
+
+`np.matmul(y[i], np.matmul(x[j].T, w[i]) + constant) >= M * (1 -
+s[i])`
+
+altering the
 margin width multiplicatively (`*`) instead of additively (`-`, yeah,
 a substraction is just an addition of a negative quantity; we could
 also go for `s[i] <= 0`if we wanted to write it with a `+` in both
