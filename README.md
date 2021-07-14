@@ -42,11 +42,19 @@ experience and more pain on my part.
 + [Chapter 10: Boosting](#boosting)
   * [Homework 10](#homework-10)
 + [Chapter 11: Neural networks](#neural-networks)
-  * [Homework 10](#homework-11)
+  * [Homework 11](#homework-11)
 + [Chapter 12: SVM and generalized LDA](#SVM-and-generalized-LDA)
-  * [Homework 10](#homework-12)
+  * [Homework 12](#homework-12)
 + [Chapter 13](#chapter-13)
   * [Homework 13](#homework-13)
++ [Chapter 14](#chapter-14)
+	* [Homework 14](#homework-14)
++ [Chapter 15](#chapter-15)
+  * [Homework 15](#homework-15)
++ [Chapter 16](#chapter-16)
+  * [Homework 16](#homework-16)
++ [Chapter 17](#chapter-17)
+  * [Homework 17](#homework-17)
 
 ## Introduction
 
@@ -1323,7 +1331,6 @@ website](http://statweb.stanford.edu/~jtaylo/courses/stats306B/fda.html).
 Pick either (a variant of) SVM or a generalization of LDA and apply it
 on your project data. Remember to analyze properly the effects of
 parameters and design choices in the prediction error.
-
 
 ## Chapter 13
 
