@@ -43,7 +43,7 @@ experience and more pain on my part.
   * [Homework 10](#homework-10)
 + [Chapter 11: Neural networks](#neural-networks)
   * [Homework 10](#homework-11)
-+ [Chapter 12: Kernels](#kernels)
++ [Chapter 12: SVM and generalized LDA](#SVM-and-generalized-LDA)
   * [Homework 10](#homework-12)
 + [Chapter 13](#chapter-13)
   * [Homework 13](#homework-13)
@@ -1266,9 +1266,64 @@ Go over the steps of the ZIP code examples in Chapter 11 and replicate
 as much as you can with your own project data. Don't forget to read
 the whole chapter before you start.
 
-## Kernels
+## SVM and generalized LDA
+
+Previously, we wanted to separate classes by hyperplanes, but it's not
+always the case that the classes _are_ in fact **linearly**
+separable. We now discuss methods for creating non-linear boundaries
+by working in a transformation of the feature space in such a way that
+the boundaries in that transformed space are linear but their
+projections, so to speak, to the original feature space might not be.
+
+Lets denote the margin at which the data points are from the
+separating hyperplane by `M`, making the width of the separation band
+`2M`. As developed in Equation (12.4) of the book, `M = 1 /
+np.linalg.norm(w)` where `w` are the weights of the linear model (the
+ones the book denotes by beta). 
+
+When the classes are not linearly separable, some of the data will end
+up on the wrong side of the boundary, which calls for (positive)
+_slack variables_ which I will denote by `s[i]` and the book denotes
+by xi. 
+
+For maximizing `M` even with some of the data on the wrong size, we
+can restrict to `np.matmul(y[i], np.matmul(x[j].T, w[i]) + constant)
+>= M - s[i]` which looks easy but results in a non-convex problem and
+that's inconvenient. So instead we opt to require `np.matmul(y[i],
+np.matmul(x[j].T, w[i]) + constant) >= M * (1 - s[i])` altering the
+margin width multiplicatively (`*`) instead of additively (`-`, yeah,
+a substraction is just an addition of a negative quantity; we could
+also go for `s[i] <= 0`if we wanted to write it with a `+` in both
+formulation).
+
+We assume that the sum of the slack variables is limited from above by
+a constant which directly limits by how much the predictions can
+escape on the wrong side: if `s[i] > 1`, the input `x[i]` is
+misclassified.
+
+A SVM (Support Vector Machine) is a classifier that optimizes this
+formulation through a Langrangian dual, but the authors warn that
+Section 12.2.1 might be a bit of a pain to process. Kernels are used
+to expand the feature space into a very large transformed one and
+regularization helps avoid overfitting. One can also use SVM for
+regression and for more than two classes. Check out the [blog post of
+Usman
+Malik](https://stackabuse.com/implementing-svm-and-kernel-svm-with-pythons-scikit-learn_ for how to get started using `scikit-learn`. 
+
+Also LDA can be generalized, which is discussed in the rest of Chapter
+12, from Section 12.4 onward. FDA stands for _flexible discriminant
+analysis_ and PDA for _penalized discriminant analysis_ (Figure 12.11
+is particularly informative about how PDA improves upon LDA). An
+example of FDA using python is available at [Jonathan Taylor's applied
+statistics course
+website](http://statweb.stanford.edu/~jtaylo/courses/stats306B/fda.html).
 
 ### Homework 12
+
+Pick either (a variant of) SVM or a generalization of LDA and apply it
+on your project data. Remember to analyze properly the effects of
+parameters and design choices in the prediction error.
+
 
 ## Chapter 13
 
