@@ -1306,7 +1306,7 @@ that's inconvenient. So instead we opt to require
 s[i])`
 
 altering the
-margin width multiplicatively (`*`) instead of additively (`-`, yeah,
+margin width multiplicatively (`*`) instead of additively (`-`;
 a substraction is just an addition of a negative quantity; we could
 also go for `s[i] <= 0`if we wanted to write it with a `+` in both
 formulation).
@@ -1350,3 +1350,11 @@ parameters and design choices in the prediction error.
 ## Variance reduction
 
 ### Homework 15
+
+## Chapter 16
+
+### Homework 16
+
+## Chapter 17
+
+### Homework 17
