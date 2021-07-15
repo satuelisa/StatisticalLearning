@@ -45,7 +45,7 @@ experience and more pain on my part.
   * [Homework 11](#homework-11)
 + [Chapter 12: SVM and generalized LDA](#SVM-and-generalized-LDA)
   * [Homework 12](#homework-12)
-+ [Chapter 13](#chapter-13)
++ [Chapter 13: Prototypes and neighbors](#prototypes-and-neighbors)
   * [Homework 13](#homework-13)
 + [Chapter 14](#chapter-14)
 	* [Homework 14](#homework-14)
@@ -1335,13 +1335,57 @@ website](http://statweb.stanford.edu/~jtaylo/courses/stats306B/fda.html).
 
 ### Homework 12
 
-Pick either (a variant of) SVM or a generalization of LDA and apply it
+Pick either (a variant of) SVM or a **generalization** of LDA and apply it
 on your project data. Remember to analyze properly the effects of
 parameters and design choices in the prediction error.
 
-## Chapter 13
+## Prototypes and neighbors
+
+Why bother with models when we can just "go with the closest match"?
+The idea here is to either pick from the existing labeled data a
+"close-by representative" and use its label for new data that happens
+to be similar to it or to _construct_ such representatives (called
+_prototypes_) from the known data points.
+
+In k-means clustering, we compute `k` _cluster centers_ by minimizing
+the distance of each known data point to its nearest center. Start
+with `k` random points in the feature space, for example, assign each
+data point to the nearest one, and then update the center by averaging
+over the members of the cluster, and repeat until some convergence
+condition is met or you run out of time or some other stopping
+condition tells you to stop. There are, of course, tons of variants on
+how exactly to carry out this idea.
+
+The absolute most famous person to have worked at the department where
+I studied, Teuvo Kohonen, proposed a methods called LVQ (learning
+vector quantification) in which the representatives are gradually
+moved towards the boundaries, starting with a random assignment of
+prototypes and then little by little moving the prototypes towards
+randomly selected training samples at a decreasing rate. 
+
+Another similar approach is the _Gaussian mixture method_ where the
+clusters are represented as Gaussian densities and one iteratively
+adjusts the weighted means and covariances (data points that are
+equidistant from two or more clusters contribute to each one of them).
+
+As mentioned before, KNN just uses the `k` closest known data points
+to assign a label to a previously unseen one; we can use a majority
+vote or a (weighted) mean or some other criteria of that kind.
+
+For all of these methods, the absolute most relevant choices are
++ how distances are measured in the feature space or a transformed version thereof
++ how many clusters / neighbors are taken into account (either of
+these could be somehow auto-adjusted based on prediction
+error). Section 13.3.3 presents the interesting option of _tangent
+distance_ to avoid some known issues.
 
 ### Homework 13
+
+After a complete read-through of Chapter 13, make a comparison between
+(some variants) of k-means, LVQ, Gaussian mixtures, and KNN for your
+project data. Since these models are pretty simple, implement at least
+one of them fully from scratch without using a library that already
+does it for you.
 
 ## Chapter 14
 
