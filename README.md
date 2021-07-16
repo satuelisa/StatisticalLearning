@@ -47,7 +47,7 @@ experience and more pain on my part.
   * [Homework 12](#homework-12)
 + [Chapter 13: Prototypes and neighbors](#prototypes-and-neighbors)
   * [Homework 13](#homework-13)
-+ [Chapter 14](#chapter-14)
++ [Chapter 14: Unsupervised learning](#unsupervised-learning)
 	* [Homework 14](#homework-14)
 + [Chapter 15](#chapter-15)
   * [Homework 15](#homework-15)
@@ -1387,9 +1387,88 @@ project data. Since these models are pretty simple, implement at least
 one of them fully from scratch without using a library that already
 does it for you.
 
-## Chapter 14
+## Unsupervised learning
+
+Now we no longer have or need pre-labeled training samples. No more
+`Y` in the equations, no more prediction in that same sense. We just
+have the `X` now, possibly with a lot more features and a lot more
+data points. The goal is to somehow **characterize** the dataset.
+
+Some ways to go about this:
+
++ estimating the _probability density_ `Pr(X)` (Section 14.1)
++ _association rules_ that describe sets of feature values that tend to appear together (Section 14.2)
++ label all of it as 'true', mash it up with random data labelled as
+  'false', and then apply regression (Section 14.2.4) or some other supervised method (Section 14.2.6)
+
+A building block for these is using binary indicator variables to
+whether or not a feature of an input is "close" to a specific
+"typical" value for that feature. Then one searches for sets of inputs
+that have the same indicators set to true (we will say that these
+inputs "match" the indicator set). The _support_ of a subset of such
+indicators refers to the proportion of data points that match it. One
+wants to find rules that have a support larger than a threshold (for
+example with the _a priori algorithm_ discussed in Section
+14.2.2). The interest is in figuring out which indicator subsets are
+simultaneously present with high probability (think of the peanut
+butter and jelly sandwich example of the aforementioned section). The
+_confidence_ of a rule `A -> B` is the support of `A -> B` normalized
+by the support of `A`. An end user will typically want to manually
+query (or automatically mine for) rules involving specific indicators
+with both support and confidence exceeding some thresholds.
+
+Another way to approach this issue, a long-time personal interest of
+mine, is through **clustering** (Section 14.3):
++ define a pairwise similarity measure (hopefully symmetrical) 
++ use the corresponding dissimilarity as a distance (hopefully meeting the triangle inequality)
++ or [define a distance](https://link.springer.com/book/10.1007/978-3-642-30958-8) and use it's inverse of some sorts as a similarity measure
++ build a proximity matrix in these terms
++ figure out a way to define similarity and/or dissimilarity for _subsets_ of data points
++ apply a _clustering algorithm_ to group the data into (possibly
+  overlapping and/or hierarchical) groups that are internally similar
+  but dissimilar between groups (the belonging into a group could also
+  be fuzzy or probabilistic), with something simple like k-means or
+  some other approach.
+  
+There is a plethora of clustering methods for data points as such, let
+alone graph representations based on thresholding the proximity matrix
+to obtain an adjacency relation. See _spectral clustering_ in Section
+14.5.3 on how to identify clusters based on the eigenvalues of the
+graph Laplacian. Also the PageRank algorithm that Google uses to
+determine which websites are relevant is based on an eigenvector; this
+is discussed in Section 14.10 and can be applied to determine relative
+importance of elements in any proximity matrix.
+  
+The utility of k-means for image processing is discussed in Section
+14.3.9 regarding _vector quantization_.  Variants of k-means that go
+beoynd the usual Euclidean distance and averaging are numerous; see
+for example Section 14.3.10.
+
+Iteratively grouping the data set gives rise to a hierarchy, best
+visualized as a _dendrogram_ (see Figure 14.12). These can be built
+with both **top-down** approaches, dividing the data into two or more
+groups in each step, or **bottom-up** by combining in each step two or
+more subsets starting with singletons.
+
+Another contribution of Teuvo Kohonen are _self-organizing maps_
+(Section 14.4) that are similar to k-means but constrained into a
+low-dimensional projection of a sort (a manifold referred to as a
+constrained topological map). The idea is to 'bend' a 2D plane of
+_principal components_ (Section 14.5) to a grid of prototypes in terms
+of a sample neighborhood. 
+
+See Sections 14.5.4 and 14.5.5 for fancy ways to apply principal
+component analysis. Other ways to make use of matrix decompositions
+include ICA (independent component analysis, Section 14.7) and other
+ways to map stuff down into a very low dimension include
+_multidimensional scaling_ (Section 14.8).
 
 ### Homework 14
+
+After reading the whole chapter, pick any three techniques introduced
+in it and apply them to your data. Make use of as many libraries as
+you please in this occasion. Discuss the drawbacks and advantages of
+each of the chosen techniques.
 
 ## Variance reduction
 
