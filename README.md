@@ -49,7 +49,7 @@ experience and more pain on my part.
   * [Homework 13](#homework-13)
 + [Chapter 14: Unsupervised learning](#unsupervised-learning)
 	* [Homework 14](#homework-14)
-+ [Chapter 15](#chapter-15)
++ [Chapter 15: Random forests](#random-forests)
   * [Homework 15](#homework-15)
 + [Chapter 16](#chapter-16)
   * [Homework 16](#homework-16)
@@ -705,6 +705,10 @@ Tukey ladder, for example) such as logarithms or powers, but _basis
 expansions_ is a more flexible way to get this done. This chapter
 deals with using piece-wise polynomials and splines as also touches the
 use of wavelets.
+
+
+There is a toy example of how to work with transformations
+in[`transform.py`](https://github.com/satuelisa/StatisticalLearning/blob/main/transform.py).
 
 It is common to doing this assuming **additivity**: each _model_
 feature is a linear combination of basis functions applied to the
@@ -1470,9 +1474,41 @@ in it and apply them to your data. Make use of as many libraries as
 you please in this occasion. Discuss the drawbacks and advantages of
 each of the chosen techniques.
 
-## Variance reduction
+## Random forests
+
+As discussed in Section 8.7 (bagging and bootstrap), one can improve
+upon a model by actually using several models (in parallel, if you
+wish) and then letting those average or vote for the outcome in some
+way. This is similar to boosting (Chapter 10) that differs from the
+former in that it is an iterative method that improves from one
+iteration to the next. Now we look into building a bunch of
+un-correlated trees and calling it a forest; the outcome is averaged
+over the individual trees.
+
+The main idea is to take a bootstrap sample as before, and then train
+a tree for that sample. Let these trees carry out a majority vote when
+a prediction is made.
+
+Each individual tree is made by selecting (independently and
+uniformly) at random a subset of `m` variables (the order of this
+subset is a parameter), pick the best split point among those `m`
+options, and then divide the data recursively until the amount of data
+points in the branchg falls beneath a defined threshold (also a model
+parameter). The smaller the value of `m`, the less relation between
+the trees is to be expected.
+
+We can use the splitting steps to determine how important the
+variables are in terms of how good the splits are (see Figure 15.5 of
+the book). Alsa a _proximity matrix_ can be derived (a bit like a
+dendrogram distance) in terms of how many shared nodes the two
+variables have.
 
 ### Homework 15
+
+After carefully reading all of Chapter 15 (regardless of how much of
+Section 15.4 results comprehensible), train (and evaluate) a random
+forest on your project data and compute also the variable importance
+and the proximity matrix corresponding to the forest.
 
 ## Chapter 16
 
