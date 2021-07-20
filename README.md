@@ -51,10 +51,11 @@ experience and more pain on my part.
 	* [Homework 14](#homework-14)
 + [Chapter 15: Random forests](#random-forests)
   * [Homework 15](#homework-15)
-+ [Chapter 16](#chapter-16)
++ [Chapter 16: Ensemble learning](#ensemble-learning)
   * [Homework 16](#homework-16)
-+ [Chapter 17](#chapter-17)
++ [Chapter 17: Graphs](#graphs)
   * [Homework 17](#homework-17)
++ [Final project](#final-project)
 
 ## Introduction
 
@@ -1510,10 +1511,52 @@ Section 15.4 results comprehensible), train (and evaluate) a random
 forest on your project data and compute also the variable importance
 and the proximity matrix corresponding to the forest.
 
-## Chapter 16
+## Ensemble learning
+
+There are also other ways to take a bunch of models and combine their
+results. Anything that trains numerous models and uses their output to
+build a prediction is in essence an ensemble method. In this chapter,
+instead of just grabbing a bunch of models at random, an actual
+_search procedure_ in the "learner space" is used to form that
+population.
+
+Instead of using as-short-as-possible binary codes for the classes and
+then the bit positions to train two-class models, one option is to use
+an error-correcting code (meaning that extra bits are added to keep
+the class identifier vectors "as far apart as possible") or just
+random long binary strings. 
+
+In **forward stagewise linear regression**, assume initially that all
+coefficients are zero and iteratively increment the ones that have the
+highest impact (using the sign of the change they produce in the
+difference between the intended label and the resulting prediction),
+with a gradually slowing learning
+rate. ([Tibshirani](http://www.stat.cmu.edu/~ryantibs/papers/stagewise.pdf)
+discusses this very clearly and in-depth). Ideally, non-relevant
+features will remain at zero coefficients whereas the relevant ones
+converge towards their "true" values.
+
+In a similar manner, in ensemble learning, one could seek to get rid
+of those ensemble members that fail to contribute. A post-processing
+(with potential discarding) can achieve this, as is discussed in
+Section 16.3. One good option is LASSO (least absolute shrinkage and
+selection operator) that does both regularization and variable
+selection (check out this [tutorial by Aarsjhay
+Jain](https://www.analyticsvidhya.com/blog/2016/01/ridge-lasso-regression-python-complete-tutorial/))
+to get rid of unwanted ensemble members (using the ensemble members
+outputs as the input variables for the prediction).
 
 ### Homework 16
 
-## Chapter 17
+Two things: examine how increasing the length of the binary string to
+identify each class in a multi-class problem affects the performance
+and carry out some sort of pruning on an ensemble method of your
+choice, both with the project data.
+
+## Graphs 
+
+:green_heart::green_heart::green_heart::green_heart::green_heart::green_heart::green_heart:
 
 ### Homework 17
+
+## Final project
