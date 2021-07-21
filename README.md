@@ -55,7 +55,8 @@ experience and more pain on my part.
   * [Homework 16](#homework-16)
 + [Chapter 17: Graphs](#graphs)
   * [Homework 17](#homework-17)
-+ [Final project](#final-project)
++ [Chapter 18: High dimensionality](#high-dimensionality)
+  * [Final project](#final-project)
 
 ## Introduction
 
@@ -1557,6 +1558,94 @@ choice, both with the project data.
 
 :green_heart::green_heart::green_heart::green_heart::green_heart::green_heart::green_heart:
 
+So, let's put the features as vertices of a graph and also throw in
+the variables we want to predict. Then, add edges using some pairwise
+measurement (conditional dependencies or the like); these could also
+be directed in the case that the chosen measure were
+asymmetric. _
+
+Bayeasian networks_ are one way to work in this fashion. Another
+approach are _Markov graphs_ where the **absence** of an edge
+represents conditional independence (given the values of the other
+variables). Interesting subsets of variables (vertices) are those that
+_separate_ the rest of the vertex sets into two in such a way that all
+paths from one to another pass through the separating subset. We can
+reason about the graph in terms of its maximal _cliques_ (complete
+subgraphs), assigning a potential function to each one.  
+
+One may either already know the structure of the graph and wish to
+determine some parameters, or both the structure and the parameters
+need to be estimated from the data. For the latter, LASSO comes in
+handy again to assume a complete graph and then rid oneself of the
+edges that have zero coefficients by only working with the non-zero
+ones (see Figure 17.5).
+
+For _continuous_ variables, Gaussian models are common, whereas for
+_discrete_ variables, the special case of binarization brings us to
+Ising models (briefly discussed at the end of the [Algorithm
+course](https://elisa.dyndns-web.com/teaching/aa/2020.html) in the
+context of phase transitions). 
+
+Also [_hidden Markov
+models_](https://web.stanford.edu/~jurafsky/slp3/A.pdf) are a cool
+field of study, especially for sequence-processing. A favorite of our
+friend, [Arturo
+Berrones](https://scholar.google.com.mx/citations?hl=en&user=RwupfCkAAAAJ),
+are _Bolzmann machines_ (see Section 17.4) that are bipartite graphs
+(layers of nodes with no internal edges in any of the layers, much
+like a layered neural network). Section 17.4.4 shows an interesting
+example of how powerful restricted Bolzmann machines can be for
+unsupervised learning.
+
 ### Homework 17
 
-## Final project
+Using either an existing graph-based model or one of your own
+creation, build a graph of the features (possibly with
+transformations, kernels or the like to expand the vertex set) and the
+variables of interest for your project data. Draw this graph using
+color and size to emphasize the relative importante of the variables
+(vertices) and their dependencies (edges). 
+
+## High dimensionality
+
+When we have tons more features than we do data points, things get
+challenging; this is often the case in medical studies (dozens or
+maybe hundreds of patients, but possibly thousands of measurements on
+each). Regularizing diagonal covariances in LDA may be useful (Section
+18.2) or quadratic regularization with a linear classifier (Section
+18.3). Feature selection becomes a must, really.
+
+### Final project
+
+Using everything you have learned about your project data during the
+17 homework assignments, write an article (as you would for a
+scientific journal) of your absolute best effort of applying
+statistical learning to the project data. Respect the usual structure
+of an article and the style of scientific writing in computational
+sciences. 
+
+Do **not** try to fit everything you did during the semestes into the
+article. Be smart and use what you learned in later homeworks to
+improve upon the results you obtained in earlier ones instead of just
+copying and pasting homework fragments together. It is recommendable
+to include a comparison of techniques instead of just one technique,
+but try to not exxagerate on how many techniques to include. It is
+especially interesting if you manage to combine two or more techniques
+into a novel adaptation for your particular situation.
+
+Include pseudocodes (with an appropriate LaTeX package) or _very clear
+and concise_ code fragments (using the `listings`package) of the
+applied methods, clear equations for anything that can be expressed
+mathematically, and pay extra attention to the quality of the
+scientific visualization of your results. Each figure or table should
+serve a clear purpose and needs to be discussed in the text; if there
+is nothing of interest to conclude about it, then it should not really
+be included.
+
+Remember to properly cite the state of the art and to provide the
+necessary concepts and notation in a background section. If the
+feedback on the homework was helpful, you can include me in the
+_acknowledgements_ section along with people who provided data or had
+helpful discussions with you during the work; only people who actually
+**write** (either the manuscript or code) should be listed as authors,
+in all honesty (that's literally what being an author means).
