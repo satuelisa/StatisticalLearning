@@ -1001,7 +1001,7 @@ training set, but _with replacement_, meaning that the individual
 inputs may (and usually will) repeat. We fit the model to these "fake"
 data sets and compare the fits, but simply averaging over the losses
 here suffers from the fallacy of using the same data for testing and
-validation, resulting in "artifically low" error estimates. Read
+validation, resulting in "artificially low" error estimates. Read
 Section 7.11 for more details on this.
 
 A conceptual toy example for this as well is available at
@@ -1313,7 +1313,7 @@ s[i])`
 
 altering the
 margin width multiplicatively (`*`) instead of additively (`-`;
-a substraction is just an addition of a negative quantity; we could
+a subtraction is just an addition of a negative quantity; we could
 also go for `s[i] <= 0`if we wanted to write it with a `+` in both
 formulation).
 
@@ -1323,7 +1323,7 @@ escape on the wrong side: if `s[i] > 1`, the input `x[i]` is
 misclassified.
 
 A SVM (Support Vector Machine) is a classifier that optimizes this
-formulation through a Langrangian dual, but the authors warn that
+formulation through a Lagrangian dual, but the authors warn that
 Section 12.2.1 might be a bit of a pain to process. Kernels are used
 to expand the feature space into a very large transformed one and
 regularization helps avoid overfitting. One can also use SVM for
@@ -1404,7 +1404,7 @@ Some ways to go about this:
 
 + estimating the _probability density_ `Pr(X)` (Section 14.1)
 + _association rules_ that describe sets of feature values that tend to appear together (Section 14.2)
-+ label all of it as 'true', mash it up with random data labelled as
++ label all of it as 'true', mash it up with random data labeled as
   'false', and then apply regression (Section 14.2.4) or some other supervised method (Section 14.2.6)
 
 A building block for these is using binary indicator variables to
@@ -1447,7 +1447,7 @@ importance of elements in any proximity matrix.
   
 The utility of k-means for image processing is discussed in Section
 14.3.9 regarding _vector quantization_.  Variants of k-means that go
-beoynd the usual Euclidean distance and averaging are numerous; see
+beyond the usual Euclidean distance and averaging are numerous; see
 for example Section 14.3.10.
 
 Iteratively grouping the data set gives rise to a hierarchy, best
@@ -1495,13 +1495,13 @@ Each individual tree is made by selecting (independently and
 uniformly) at random a subset of `m` variables (the order of this
 subset is a parameter), pick the best split point among those `m`
 options, and then divide the data recursively until the amount of data
-points in the branchg falls beneath a defined threshold (also a model
+points in the branch falls beneath a defined threshold (also a model
 parameter). The smaller the value of `m`, the less relation between
 the trees is to be expected.
 
 We can use the splitting steps to determine how important the
 variables are in terms of how good the splits are (see Figure 15.5 of
-the book). Alsa a _proximity matrix_ can be derived (a bit like a
+the book). Also a _proximity matrix_ can be derived (a bit like a
 dendrogram distance) in terms of how many shared nodes the two
 variables have.
 
@@ -1564,7 +1564,7 @@ measurement (conditional dependencies or the like); these could also
 be directed in the case that the chosen measure were
 asymmetric. _
 
-Bayeasian networks_ are one way to work in this fashion. Another
+Bayesian networks_ are one way to work in this fashion. Another
 approach are _Markov graphs_ where the **absence** of an edge
 represents conditional independence (given the values of the other
 variables). Interesting subsets of variables (vertices) are those that
@@ -1603,7 +1603,7 @@ Using either an existing graph-based model or one of your own
 creation, build a graph of the features (possibly with
 transformations, kernels or the like to expand the vertex set) and the
 variables of interest for your project data. Draw this graph using
-color and size to emphasize the relative importante of the variables
+color and size to emphasize the relative importance of the variables
 (vertices) and their dependencies (edges). 
 
 ## High dimensionality
@@ -1624,12 +1624,12 @@ statistical learning to the project data. Respect the usual structure
 of an article and the style of scientific writing in computational
 sciences. 
 
-Do **not** try to fit everything you did during the semestes into the
+Do **not** try to fit everything you did during the semester into the
 article. Be smart and use what you learned in later homeworks to
 improve upon the results you obtained in earlier ones instead of just
 copying and pasting homework fragments together. It is recommendable
 to include a comparison of techniques instead of just one technique,
-but try to not exxagerate on how many techniques to include. It is
+but try to not exaggerate on how many techniques to include. It is
 especially interesting if you manage to combine two or more techniques
 into a novel adaptation for your particular situation.
 
@@ -1645,7 +1645,7 @@ be included.
 Remember to properly cite the state of the art and to provide the
 necessary concepts and notation in a background section. If the
 feedback on the homework was helpful, you can include me in the
-_acknowledgements_ section along with people who provided data or had
+_acknowledgments_ section along with people who provided data or had
 helpful discussions with you during the work; only people who actually
 **write** (either the manuscript or code) should be listed as authors,
 in all honesty (that's literally what being an author means).
